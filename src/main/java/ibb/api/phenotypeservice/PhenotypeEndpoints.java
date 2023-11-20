@@ -51,11 +51,13 @@ public class PhenotypeEndpoints {
 
     @DELETE
     @Path("/{id}")
+    @Transactional
     public void delete(@RestPath Long id) {
         Phenotype existing = Phenotype.findById(id);
         if (existing == null) {
             throw new NotFoundException();
         }
+        imageService.delete(existing.imageIds);
         existing.delete();
     }
 }
