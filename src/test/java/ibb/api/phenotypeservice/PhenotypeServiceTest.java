@@ -1,24 +1,8 @@
 package ibb.api.phenotypeservice;
 
-import io.quarkus.test.common.http.TestHTTPEndpoint;
-import io.quarkus.test.junit.QuarkusMock;
-import io.quarkus.test.junit.QuarkusTest;
-import io.restassured.RestAssured;
-
-import org.eclipse.microprofile.rest.client.inject.RestClient;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
-
-import ibb.api.phenotypeservice.models.DsRNA;
-import ibb.api.phenotypeservice.models.OntologyTerm;
-import ibb.api.phenotypeservice.models.Phenotype;
-import ibb.api.phenotypeservice.models.Reference;
-
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,10 +11,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.LongStream;
 
+import org.eclipse.microprofile.rest.client.inject.RestClient;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+
+import ibb.api.phenotypeservice.Phenotype.OntologyTerm;
+import io.quarkus.test.common.http.TestHTTPEndpoint;
+import io.quarkus.test.junit.QuarkusMock;
+import io.quarkus.test.junit.QuarkusTest;
+import io.restassured.RestAssured;
+
 @QuarkusTest
-@TestHTTPEndpoint(PhenotypeEndpoints.class)
+@TestHTTPEndpoint(PhenotypeService.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class PhenotypeEndpointsTest {
+public class PhenotypeServiceTest {
 
     @BeforeAll
     public static void setUp() throws IOException {
@@ -68,15 +65,12 @@ public class PhenotypeEndpointsTest {
                 .statusCode(200)
                 .body("id", notNullValue())
                 .body("gene", equalTo("TC003413"));
-        
-        assertEquals(1, Phenotype.count());
     }
 
     @Test
     @Order(2)
     public void shouldFindPhenotypesByGene() {
-        
-        assertEquals(1, Phenotype.count(), "Phenotype should be created");
+    
         RestAssured
             .given()
                 .pathParam("gene", "TC003413")
@@ -89,6 +83,20 @@ public class PhenotypeEndpointsTest {
                 .body("[0].gene", equalTo("TC003413"))
                 .body("[0].dsRNA.sequence", equalTo("ATGCG"))
                 .body("[0].imageIds.size()", equalTo(2));
+    }
+
+    @Test
+    @Order(2)
+    public void shouldFindPhenotypesByPattern() {
+        RestAssured
+            .given()
+                .queryParam("pattern", "head")
+            .when()
+                .get("/search")
+            .then()
+                .statusCode(200)
+                .body("size()", is(1))
+                .body("[0].id", equalTo(1));
     }
 
     @Test
@@ -131,11 +139,11 @@ public class PhenotypeEndpointsTest {
     }
 
     private Phenotype createValidPhenotype() {
-        DsRNA dsRNA = new DsRNA();
+        Phenotype.DsRNA dsRNA = new Phenotype.DsRNA();
         dsRNA.sequence = "ATGCG";
 
-        Reference reference = new Reference();
-        reference.type = Reference.Type.LAB;
+        Phenotype.Reference reference = new Phenotype.Reference();
+        reference.type = Phenotype.Reference.Type.LAB;
         reference.value = "Gregor Bucher";
 
         OntologyTerm structure = new OntologyTerm();
