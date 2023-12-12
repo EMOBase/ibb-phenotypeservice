@@ -13,7 +13,7 @@ import jakarta.ws.rs.Path;
 
 @Path("/images")
 @RegisterRestClient(configKey = "image-service")
-public interface ImageService {
+public interface ImageServiceClient {
 
     public static class ImageMetadata {
         public Long id;

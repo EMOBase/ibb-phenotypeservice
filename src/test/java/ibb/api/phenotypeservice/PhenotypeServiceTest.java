@@ -23,6 +23,7 @@ import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusMock;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.RestAssured;
+import jakarta.inject.Inject;
 
 @QuarkusTest
 @TestHTTPEndpoint(PhenotypeService.class)
@@ -31,7 +32,7 @@ public class PhenotypeServiceTest {
 
     @BeforeAll
     public static void setUp() throws IOException {
-        ImageService imageService = new ImageService() {
+        ImageServiceClient imageService = new ImageServiceClient() {
             @Override
             public List<ImageMetadata> upload(List<File> images) {
                 return LongStream.rangeClosed(1, images.size())
@@ -46,15 +47,22 @@ public class PhenotypeServiceTest {
             @Override
             public void delete(List<Long> ids) {}
         };
-        QuarkusMock.installMockForType(imageService, ImageService.class, RestClient.LITERAL);
+        QuarkusMock.installMockForType(imageService, ImageServiceClient.class, RestClient.LITERAL);
+
     }
+
+    @Inject
+    PhenotypeRepository phenotypeRepository;
+
+    static String phenotypeId;
 
     @Test
     @Order(1)
     public void shouldCreatePhenotype() {
+        phenotypeRepository.deleteIndex();
         Phenotype phenotype = createValidPhenotype();
         File[] images = createTempImageFiles(2);
-        RestAssured
+        phenotypeId = RestAssured
             .given()
                 .multiPart("phenotype", phenotype, "application/json")
                 .multiPart("images", images[0], "image/jpeg")
@@ -64,7 +72,10 @@ public class PhenotypeServiceTest {
             .then()
                 .statusCode(200)
                 .body("id", notNullValue())
-                .body("gene", equalTo("TC003413"));
+                .body("gene", equalTo("TC003413"))
+            .extract()
+                .as(Phenotype.class).id;
+        phenotypeRepository.refresh();
     }
 
     @Test
@@ -79,7 +90,7 @@ public class PhenotypeServiceTest {
             .then()
                 .statusCode(200)
                 .body("size()", is(1))
-                .body("[0].id", equalTo(1))
+                .body("[0].id", equalTo(phenotypeId))
                 .body("[0].gene", equalTo("TC003413"))
                 .body("[0].dsRNA.sequence", equalTo("ATGCG"))
                 .body("[0].imageIds.size()", equalTo(2));
@@ -90,13 +101,13 @@ public class PhenotypeServiceTest {
     public void shouldFindPhenotypesByPattern() {
         RestAssured
             .given()
-                .queryParam("pattern", "head")
+                .queryParam("query", "head")
             .when()
                 .get("/search")
             .then()
                 .statusCode(200)
-                .body("size()", is(1))
-                .body("[0].id", equalTo(1));
+                .body("total", is(1))
+                .body("data[0].id", equalTo(phenotypeId));
     }
 
     @Test
@@ -104,11 +115,12 @@ public class PhenotypeServiceTest {
     public void shouldDeletePhenotype() {
         RestAssured
             .given()
-                .pathParam("id", 1)
+                .pathParam("id", phenotypeId)
             .when()
                 .delete("/{id}")
             .then()
                 .statusCode(204);
+        phenotypeRepository.refresh();
     }
 
     @Test

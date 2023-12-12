@@ -2,24 +2,21 @@ package ibb.api.phenotypeservice;
 
 import java.io.File;
 import java.util.List;
-import java.util.Optional;
 
-import org.eclipse.microprofile.rest.client.inject.RestClient;
-import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.jboss.resteasy.reactive.PartType;
 import org.jboss.resteasy.reactive.RestForm;
 import org.jboss.resteasy.reactive.RestPath;
 import org.jboss.resteasy.reactive.RestQuery;
 
+import ibb.api.phenotypeservice.PhenotypeRepository.SearchResult;
 import io.quarkus.logging.Log;
-import io.quarkus.runtime.StartupEvent;
-import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.groups.ConvertGroup;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
@@ -43,22 +40,9 @@ public class PhenotypeService {
     }
 
     @Inject
-    @RestClient
-    ImageService imageService;
-
-    @Inject
-    SearchSession searchSession;
-
-    @Transactional
-    void onStart(@Observes StartupEvent ev) throws InterruptedException {
-        // only reindex if we imported some content
-        if (Phenotype.count() > 0) {
-            searchSession.massIndexer().startAndWait();
-        }
-    }
+    PhenotypeRepository phenotypeRepository;
 
     @POST
-    @Transactional
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
     public Phenotype create(
@@ -71,54 +55,29 @@ public class PhenotypeService {
         @ConvertGroup(to = Phenotype.ValidationGroups.Create.class)
         Phenotype phenotype) {
         
-        List<Long> imageIds = null;
-        if (images.size() > 0) {
-            imageIds = imageService.upload(images).stream().map(metadata -> metadata.id).toList();
-        }
-        phenotype.imageIds = imageIds;
-        Phenotype.persist(phenotype);
-        return phenotype;
+        return phenotypeRepository.create(phenotype, images);
     }
 
     @GET
     @Path("/by-gene/{gene}")
     @Produces(MediaType.APPLICATION_JSON)
     public List<Phenotype> getByGene(@RestPath String gene) {
-        List<Phenotype> phenotypes = Phenotype.list("gene", gene);
-        return phenotypes;
+        return phenotypeRepository.findByGene(gene);
     }
 
     @DELETE
     @Path("/{id}")
-    @Transactional
-    public void delete(@RestPath Long id) {
-        Phenotype existing = Phenotype.findById(id);
+    public void delete(@RestPath String id) {
+        Phenotype existing = phenotypeRepository.findById(id);
         if (existing == null) {
             throw new NotFoundException();
         }
-        imageService.delete(existing.imageIds);
-        existing.delete();
+        phenotypeRepository.delete(existing);
     }
 
     @GET
     @Path("/search")
-    @Transactional
-    public List<Phenotype> search(@RestQuery String pattern, @RestQuery Optional<Integer> size) {
-        return searchSession.search(Phenotype.class)
-            .where(f ->
-                pattern == null || pattern.trim().isEmpty() ?
-                    f.matchAll() :
-                    f.simpleQueryString()
-                        .fields(
-                            "gene", 
-                            "description", 
-                            "dsRNA.name",
-                            "structure.termId",
-                            "structure.termName",
-                            "process"
-                        )
-                        .matching(pattern)
-            )
-            .fetchHits(size.orElse(20));
+    public SearchResult<Phenotype> search(@NotBlank @RestQuery String query, @DefaultValue("0") @RestQuery int from, @DefaultValue("10") @RestQuery int size) {
+        return phenotypeRepository.search(query, from, size);
     }
 }
