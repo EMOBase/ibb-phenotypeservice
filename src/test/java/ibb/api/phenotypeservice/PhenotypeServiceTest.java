@@ -51,15 +51,36 @@ public class PhenotypeServiceTest {
 
     }
 
+    private static class Timeline {
+        public static final int INITIAL = 1;
+        public static final int BEFORE_CREATE_PHENOTYPE = 2;
+        public static final int AFTER_CREATE_PHENOTYPE = 3;
+        public static final int BEFORE_DELETE_PHENOTYPE = 4;
+        public static final int AFTER_DELETE_PHENOTYPE = 5;
+    }
+
     @Inject
     PhenotypeRepository phenotypeRepository;
 
     static String phenotypeId;
 
     @Test
-    @Order(1)
+    @Order(Timeline.INITIAL)
+    public void shouldFindNoPhenotypes() {
+        phenotypeRepository.refresh();
+        RestAssured
+            .given()
+                .pathParam("gene", "TC003413")
+            .when()
+                .get("/by-gene/{gene}")
+            .then()
+                .statusCode(200)
+                .body("size()", is(0));
+    }
+
+    @Test
+    @Order(Timeline.BEFORE_CREATE_PHENOTYPE)
     public void shouldCreatePhenotype() {
-        phenotypeRepository.deleteIndex();
         Phenotype phenotype = createValidPhenotype();
         File[] images = createTempImageFiles(2);
         phenotypeId = RestAssured
@@ -79,7 +100,7 @@ public class PhenotypeServiceTest {
     }
 
     @Test
-    @Order(2)
+    @Order(Timeline.AFTER_CREATE_PHENOTYPE)
     public void shouldFindPhenotypesByGene() {
     
         RestAssured
@@ -97,7 +118,7 @@ public class PhenotypeServiceTest {
     }
 
     @Test
-    @Order(2)
+    @Order(Timeline.AFTER_CREATE_PHENOTYPE)
     public void shouldFindPhenotypesByPattern() {
         RestAssured
             .given()
@@ -111,7 +132,7 @@ public class PhenotypeServiceTest {
     }
 
     @Test
-    @Order(3)
+    @Order(Timeline.BEFORE_DELETE_PHENOTYPE)
     public void shouldDeletePhenotype() {
         RestAssured
             .given()
@@ -124,7 +145,7 @@ public class PhenotypeServiceTest {
     }
 
     @Test
-    @Order(4)
+    @Order(Timeline.AFTER_DELETE_PHENOTYPE)
     public void shouldFindNoPhenotypesAfterDeleted() {      
         RestAssured
             .given()

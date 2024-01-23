@@ -13,14 +13,22 @@ import co.elastic.clients.elasticsearch.core.GetResponse;
 import co.elastic.clients.elasticsearch.core.IndexResponse;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
+import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
+/**
+ * Handle operations with the database.
+ * Current implementation uses Elasticsearch.
+ */
 @ApplicationScoped
 public class PhenotypeRepository {
 
     @ConfigProperty(name = "phenotypeservice.elasticsearch.index-name")
     String indexName;
+
+    @ConfigProperty(name = "phenotypeservice.elasticsearch.delete-index-on-start", defaultValue = "false")
+    boolean deleteIndexOnStart;
     
     @Inject
     ElasticsearchClient esClient;
@@ -28,6 +36,14 @@ public class PhenotypeRepository {
     @Inject
     @RestClient
     ImageServiceClient imageServiceClient;
+
+    @PostConstruct
+    void init() {
+        if (deleteIndexOnStart) {
+            deleteIndex();       
+        }
+        createIndexIfNotExists();
+    }
 
     public static class SearchResult<T> {
         public List<T> data;
@@ -96,6 +112,17 @@ public class PhenotypeRepository {
     public void deleteIndex() {
         try {
             esClient.indices().delete(d -> d.index(indexName).ignoreUnavailable(true));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void createIndexIfNotExists() {
+        try {
+            System.out.println("Index: " + indexName);
+            if (!esClient.indices().exists(e -> e.index(indexName)).value()) {
+                esClient.indices().create(i -> i.index(indexName));
+            };
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -9,7 +9,6 @@ import org.jboss.resteasy.reactive.RestPath;
 import org.jboss.resteasy.reactive.RestQuery;
 
 import ibb.api.phenotypeservice.PhenotypeRepository.SearchResult;
-import io.quarkus.logging.Log;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -23,21 +22,21 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.ext.ExceptionMapper;
-import jakarta.ws.rs.ext.Provider;
 
+/**
+ * Handle requests from network.
+ */
 @Path("/phenotypes")
 public class PhenotypeService {
 
-    @Provider
-    public static class CustomExceptionMapper implements ExceptionMapper<Exception> {
-        @Override
-        public Response toResponse(Exception exception) {
-            Log.error(exception.getMessage(), exception);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-        }
-    }
+    // @Provider
+    // public static class CustomExceptionMapper implements ExceptionMapper<Exception> {
+    //     @Override
+    //     public Response toResponse(Exception exception) {
+    //         Log.error(exception.getMessage(), exception);
+    //         return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+    //     }
+    // }
 
     @Inject
     PhenotypeRepository phenotypeRepository;
