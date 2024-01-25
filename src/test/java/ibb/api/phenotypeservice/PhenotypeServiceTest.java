@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.LongStream;
+import java.util.UUID;
 
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.junit.jupiter.api.BeforeAll;
@@ -34,18 +34,14 @@ public class PhenotypeServiceTest {
     public static void setUp() throws IOException {
         ImageServiceClient imageService = new ImageServiceClient() {
             @Override
-            public List<ImageMetadata> upload(List<File> images) {
-                return LongStream.rangeClosed(1, images.size())
-                    .mapToObj(i -> {
-                        ImageMetadata metadata = new ImageMetadata();
-                        metadata.id = (long) i;
-                        return metadata;
-                    })
-                    .toList();
+            public List<ImageMetadata> upload(File file) {
+                ImageMetadata metadata = new ImageMetadata();
+                metadata.id = UUID.randomUUID().toString();
+                return List.of(metadata);
             }
 
             @Override
-            public void delete(List<Long> ids) {}
+            public void delete(List<String> ids) {}
         };
         QuarkusMock.installMockForType(imageService, ImageServiceClient.class, RestClient.LITERAL);
 

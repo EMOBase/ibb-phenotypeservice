@@ -94,5 +94,5 @@ public class Phenotype {
     @Schema(example = "10")
     public Integer numberOfAnimals;
 
-    public List<Long> imageIds;
+    public List<String> imageIds;
 }

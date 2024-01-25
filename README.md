@@ -18,13 +18,14 @@ These commands might be useful after a long time not working on this project:
 
 ## Deployment
 
-To build docker image:
+To run tests and build docker image:
 ```
 quarkus build -Dquarkus.container-image.build=true
 ```
 
-To build without running tests:
+To run the same thing as above but in 2 commands:
 ```
+quarkus test --once
 quarkus build -Dquarkus.container-image.build=true -DskipTests
 ```
 

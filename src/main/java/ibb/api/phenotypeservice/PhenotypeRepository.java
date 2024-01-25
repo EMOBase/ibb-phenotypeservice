@@ -13,6 +13,7 @@ import co.elastic.clients.elasticsearch.core.GetResponse;
 import co.elastic.clients.elasticsearch.core.IndexResponse;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
+import io.quarkus.logging.Log;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -43,6 +44,7 @@ public class PhenotypeRepository {
             deleteIndex();       
         }
         createIndexIfNotExists();
+        Log.infof("Elasticsearch index name: %s", indexName);
     }
 
     public static class SearchResult<T> {
@@ -84,9 +86,15 @@ public class PhenotypeRepository {
     }
 
     public Phenotype create(Phenotype phenotype, List<File> images) {
-        List<Long> imageIds = null;
+        List<String> imageIds = null;
+        Log.debugf("Uploading %d images", images.size());
         if (images.size() > 0) {
-            imageIds = imageServiceClient.upload(images).stream().map(metadata -> metadata.id).toList();
+            // Upload each image in a separate request because multiple images don't work.
+            // Quarkus issue.
+            imageIds = images.stream()
+                .map(imageServiceClient::upload)
+                .flatMap(List::stream)
+                .map(metadata -> metadata.id).toList();
         } else {
             imageIds = List.of();
         }
@@ -119,7 +127,6 @@ public class PhenotypeRepository {
 
     public void createIndexIfNotExists() {
         try {
-            System.out.println("Index: " + indexName);
             if (!esClient.indices().exists(e -> e.index(indexName)).value()) {
                 esClient.indices().create(i -> i.index(indexName));
             };
