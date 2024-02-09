@@ -110,7 +110,10 @@ public class PhenotypeRepository {
 
     public void delete(Phenotype phenotype) {
         try {
-            imageServiceClient.delete(phenotype.imageIds);
+            List<String> imageIds = Optional.ofNullable(phenotype.imageIds).orElseGet(List::of);
+            if (imageIds.size() > 0) {
+                imageServiceClient.delete(String.join(",", imageIds));
+            }
             esClient.delete(d -> d.index(indexName).id(phenotype.id));
         } catch (Exception e) {
             throw new RuntimeException(e);

@@ -17,7 +17,7 @@ import jakarta.ws.rs.core.MediaType;
 
 @RegisterRestClient(configKey = "image-service")
 @RegisterClientHeaders
-@Path("/images")
+@Path("/")
 public interface ImageServiceClient {
 
     public static class ImageMetadata {
@@ -25,10 +25,12 @@ public interface ImageServiceClient {
     }
     
     @POST
+    @Path("/images")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
     public List<ImageMetadata> upload(@RestForm File images);
 
     @DELETE
-    public void delete(@RestQuery List<String> ids);
+    @Path("/image-metadata")
+    public void delete(@RestQuery("ids") String commaSeparatedIds);
 }

@@ -41,7 +41,7 @@ public class PhenotypeServiceTest {
             }
 
             @Override
-            public void delete(List<String> ids) {}
+            public void delete(String ids) {}
         };
         QuarkusMock.installMockForType(imageService, ImageServiceClient.class, RestClient.LITERAL);
 
