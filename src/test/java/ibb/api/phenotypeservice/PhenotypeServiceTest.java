@@ -26,7 +26,7 @@ import io.restassured.RestAssured;
 import jakarta.inject.Inject;
 
 @QuarkusTest
-@TestHTTPEndpoint(PhenotypeService.class)
+@TestHTTPEndpoint(CommunityPhenotypeEndpoints.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class PhenotypeServiceTest {
 
@@ -56,7 +56,7 @@ public class PhenotypeServiceTest {
     }
 
     @Inject
-    PhenotypeRepository phenotypeRepository;
+    CommunityPhenotypeRepository phenotypeRepository;
 
     static String phenotypeId;
 

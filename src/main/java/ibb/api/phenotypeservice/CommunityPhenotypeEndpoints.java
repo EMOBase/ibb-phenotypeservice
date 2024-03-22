@@ -8,7 +8,7 @@ import org.jboss.resteasy.reactive.RestForm;
 import org.jboss.resteasy.reactive.RestPath;
 import org.jboss.resteasy.reactive.RestQuery;
 
-import ibb.api.phenotypeservice.PhenotypeRepository.SearchResult;
+import ibb.api.phenotypeservice.CommunityPhenotypeRepository.SearchResult;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -23,11 +23,8 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 
-/**
- * Handle requests from network.
- */
-@Path("/phenotypes")
-public class PhenotypeService {
+@Path("/community-phenotypes")
+public class CommunityPhenotypeEndpoints {
 
     // @Provider
     // public static class CustomExceptionMapper implements ExceptionMapper<Exception> {
@@ -39,7 +36,7 @@ public class PhenotypeService {
     // }
 
     @Inject
-    PhenotypeRepository phenotypeRepository;
+    CommunityPhenotypeRepository phenotypeRepository;
 
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)

@@ -1,50 +1,32 @@
 package ibb.api.phenotypeservice;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
-import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.GetResponse;
-import co.elastic.clients.elasticsearch.core.IndexResponse;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
-import io.quarkus.logging.Log;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
-/**
- * Handle operations with the database.
- * Current implementation uses Elasticsearch.
- */
 @ApplicationScoped
-public class PhenotypeRepository {
-
-    @ConfigProperty(name = "phenotypeservice.elasticsearch.index-name")
-    String indexName;
-
-    @ConfigProperty(name = "phenotypeservice.elasticsearch.delete-index-on-start", defaultValue = "false")
-    boolean deleteIndexOnStart;
+public class PhenotypeFetcher {
+    @ConfigProperty(name = "phenotypeservice.elasticsearch.index-prefix")
+    String indexPrefix;
     
     @Inject
     ElasticsearchClient esClient;
 
-    @Inject
-    @RestClient
-    ImageServiceClient imageServiceClient;
+    private String indexName;
 
     @PostConstruct
     void init() {
-        if (deleteIndexOnStart) {
-            deleteIndex();       
-        }
-        createIndexIfNotExists();
-        Log.infof("Elasticsearch index name: %s", indexName);
+        indexName = indexPrefix + "-*";
     }
 
     public static class SearchResult<T> {
@@ -83,67 +65,6 @@ public class PhenotypeRepository {
 
     public Optional<Phenotype> findByIdOptional(String id) {
         return Optional.ofNullable(findById(id));
-    }
-
-    public Phenotype create(Phenotype phenotype, List<File> images) {
-        List<String> imageIds = null;
-        Log.debugf("Uploading %d images", images.size());
-        if (images.size() > 0) {
-            // Upload each image in a separate request because multiple images don't work.
-            // Quarkus issue.
-            imageIds = images.stream()
-                .map(imageServiceClient::upload)
-                .flatMap(List::stream)
-                .map(metadata -> metadata.id).toList();
-        } else {
-            imageIds = List.of();
-        }
-        phenotype.imageIds = imageIds;
-        try {
-            IndexResponse response = esClient.index(i -> i.index(indexName).document(phenotype));
-            phenotype.id = response.id();
-            return phenotype;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void delete(Phenotype phenotype) {
-        try {
-            List<String> imageIds = Optional.ofNullable(phenotype.imageIds).orElseGet(List::of);
-            if (imageIds.size() > 0) {
-                imageServiceClient.delete(String.join(",", imageIds));
-            }
-            esClient.delete(d -> d.index(indexName).id(phenotype.id));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void deleteIndex() {
-        try {
-            esClient.indices().delete(d -> d.index(indexName).ignoreUnavailable(true));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void createIndexIfNotExists() {
-        try {
-            if (!esClient.indices().exists(e -> e.index(indexName)).value()) {
-                esClient.indices().create(i -> i.index(indexName));
-            };
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void refresh() {
-        try {
-            esClient.indices().refresh(r -> r.index(indexName));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public SearchResult<Phenotype> search(String query, int from, int size) {

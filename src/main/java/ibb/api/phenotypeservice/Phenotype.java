@@ -95,4 +95,12 @@ public class Phenotype {
     public Integer numberOfAnimals;
 
     public List<String> imageIds;
+
+    public String iBeetleExperiment;
+    public String iBeetleScreen;
+    public String iBeetleTopic;
+    public String dayPostInjection;
+    public String comment;
+    public List<OntologyTerm> additionalStructures;
+    public List<String> additionalGenes;
 }
