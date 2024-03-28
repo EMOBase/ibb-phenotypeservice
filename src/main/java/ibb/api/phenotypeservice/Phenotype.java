@@ -1,27 +1,34 @@
 package ibb.api.phenotypeservice;
 
+import java.time.Instant;
 import java.util.List;
 
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
-import jakarta.validation.groups.Default;
 
+@JsonInclude(JsonInclude.Include.NON_ABSENT)
 public class Phenotype {
 
     public static interface ValidationGroups {
-        public static interface Create extends Default {}
-        public static interface Update extends Default {}
+        public static interface Create {}
+    }
+
+    public static enum Status {
+        PENDING, APPROVED, REJECTED
     }
 
     public static class DsRNA {
         @Schema(example = "iB_03553")
         public String name;
 
-        @NotBlank
+        @NotBlank(groups = ValidationGroups.Create.class)
         @Schema(example = "CGAGATAGTGAGTTTCTTCT")
         public String sequence;
     }
@@ -30,7 +37,7 @@ public class Phenotype {
         @Schema(example = "TrOn_0000168")
         public String termId;
         
-        @NotBlank
+        @NotBlank(groups = ValidationGroups.Create.class)
         @Schema(example = "head")
         public String termName;
     }
@@ -43,64 +50,67 @@ public class Phenotype {
         @Schema(example = "LAB")
         public Type type;
 
-        @NotBlank
+        @NotBlank(groups = ValidationGroups.Create.class)
         @Schema(example = "Gregor Bucher")
         public String value;
     }
 
     @Null(groups = ValidationGroups.Create.class)
-    @NotNull(groups = ValidationGroups.Update.class)
     public String id;
 
-    @NotBlank
-    @Schema(example = "TC003413")
+    @NotBlank(groups = ValidationGroups.Create.class)
     public String gene;
 
     @Valid
-    @NotNull
+    @NotNull(groups = ValidationGroups.Create.class)
     public DsRNA dsRNA;
 
-    @NotNull
+    @NotNull(groups = ValidationGroups.Create.class)
     @Schema(example = "0.5")
     public Float concentration; // ng/ul
 
-    @NotBlank
+    @NotBlank(groups = ValidationGroups.Create.class)
     @Schema(example = "L1")
     public String injectedStage;
 
-    @NotBlank
+    @NotBlank(groups = ValidationGroups.Create.class)
     @Schema(example = "Ga-2")
     public String injectedStrain;
 
-    @NotNull
+    @NotNull(groups = ValidationGroups.Create.class)
     @Valid
     public Reference reference;
 
-    @NotBlank
+    @NotBlank(groups = ValidationGroups.Create.class)
     @Schema(example = "head size decreased")
     public String description;
 
-    @NotNull
-    @Valid
-    public OntologyTerm structure;
+    @NotEmpty(groups = ValidationGroups.Create.class)
+    public List<@Valid OntologyTerm> structures;
 
     @Schema(example = "head development")
     public String process;
 
-    @NotNull
+    @NotNull(groups = ValidationGroups.Create.class)
     @Schema(example = "0.6")
     public Float penetrance;
 
     @Schema(example = "10")
     public Integer numberOfAnimals;
 
+    @Null(groups = ValidationGroups.Create.class)
     public List<String> imageIds;
 
-    public String iBeetleExperiment;
-    public String iBeetleScreen;
-    public String iBeetleTopic;
+    public String topic;
     public String dayPostInjection;
     public String comment;
-    public List<OntologyTerm> additionalStructures;
-    public List<String> additionalGenes;
+
+    @Null(groups = ValidationGroups.Create.class)
+    public boolean iBeetle = false;
+
+    @Null(groups = ValidationGroups.Create.class)
+    public Status status = Status.PENDING;
+
+    @Null(groups = ValidationGroups.Create.class)
+    public Instant createdAt;
 }

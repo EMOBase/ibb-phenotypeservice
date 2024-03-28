@@ -26,7 +26,7 @@ import io.restassured.RestAssured;
 import jakarta.inject.Inject;
 
 @QuarkusTest
-@TestHTTPEndpoint(CommunityPhenotypeEndpoints.class)
+@TestHTTPEndpoint(PhenotypeEndpoints.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class PhenotypeServiceTest {
 
@@ -41,10 +41,12 @@ public class PhenotypeServiceTest {
             }
 
             @Override
-            public void delete(String ids) {}
+            public void reject(List<String> ids) {}
+
+            @Override
+            public void approve(List<String> ids) {}
         };
         QuarkusMock.installMockForType(imageService, ImageServiceClient.class, RestClient.LITERAL);
-
     }
 
     private static class Timeline {
@@ -56,14 +58,13 @@ public class PhenotypeServiceTest {
     }
 
     @Inject
-    CommunityPhenotypeRepository phenotypeRepository;
+    PhenotypeRepository phenotypeRepository;
 
     static String phenotypeId;
 
     @Test
     @Order(Timeline.INITIAL)
     public void shouldFindNoPhenotypes() {
-        phenotypeRepository.refresh();
         RestAssured
             .given()
                 .pathParam("gene", "TC003413")
@@ -92,7 +93,6 @@ public class PhenotypeServiceTest {
                 .body("gene", equalTo("TC003413"))
             .extract()
                 .as(Phenotype.class).id;
-        phenotypeRepository.refresh();
     }
 
     @Test
@@ -137,7 +137,6 @@ public class PhenotypeServiceTest {
                 .delete("/{id}")
             .then()
                 .statusCode(204);
-        phenotypeRepository.refresh();
     }
 
     @Test
@@ -187,7 +186,7 @@ public class PhenotypeServiceTest {
         phenotype.injectedStrain = "Ga-2";
         phenotype.reference = reference;
         phenotype.description = "head shortened";
-        phenotype.structure = structure;
+        phenotype.structures = List.of(structure);
         phenotype.process = "head development";
         phenotype.penetrance = 0.5f;
         phenotype.numberOfAnimals = 10;
