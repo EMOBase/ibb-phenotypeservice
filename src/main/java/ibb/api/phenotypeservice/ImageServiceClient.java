@@ -15,11 +15,12 @@ import jakarta.ws.rs.core.MediaType;
 @Path("/")
 @RegisterRestClient(configKey = "image-service")
 public interface ImageServiceClient {
-
+    
     public static class ImageMetadata {
         public String id;
+        public String status;
     }
-    
+
     @POST
     @Path("/images")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
@@ -28,9 +29,9 @@ public interface ImageServiceClient {
 
     @POST
     @Path("/image-metadata/reject")
-    public void reject(@RestForm List<String> ids);
+    public void reject(List<String> ids);
 
     @POST
     @Path("/image-metadata/approve")
-    public void approve(@RestForm List<String> ids);
+    public void approve(List<String> ids);
 }

@@ -9,6 +9,7 @@ import org.jboss.resteasy.reactive.RestForm;
 import org.jboss.resteasy.reactive.RestPath;
 import org.jboss.resteasy.reactive.RestQuery;
 
+import ibb.api.phenotypeservice.PhenotypeRepository.PhenotypeAggregationQueryResult;
 import ibb.api.phenotypeservice.PhenotypeRepository.QueryResult;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
@@ -23,19 +24,19 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 
-@Path("/search")
+@Path("/phenotypes")
 public class PhenotypeEndpoints {
     
     @Inject
     PhenotypeRepository phenotypeRepository;
 
     @GET
-    public QueryResult<Phenotype> search(
+    @Path("/search")
+    public PhenotypeAggregationQueryResult search(
         @RestQuery @NotBlank String query,
-        @RestQuery @DefaultValue("0") int from,
-        @RestQuery @DefaultValue("20") int size
-    ) {
-        return null;
+        @RestQuery String searchAfter
+    ) throws IOException {
+        return phenotypeRepository.search(query, searchAfter);
     }
 
     @POST
@@ -73,13 +74,13 @@ public class PhenotypeEndpoints {
 
     @POST
     @Path("/reject")
-    public void reject(@RestForm @NotEmpty List<String> ids) throws IOException {
+    public void reject(@NotEmpty List<String> ids) throws IOException {
         phenotypeRepository.reject(ids);
     }
 
     @POST
     @Path("/approve")
-    public void approve(@RestForm @NotEmpty List<String> ids) throws IOException {
+    public void approve(@NotEmpty List<String> ids) throws IOException {
         phenotypeRepository.approve(ids);
     }
 }

@@ -18,12 +18,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._helpers.bulk.BulkIngester;
+import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.Refresh;
 import co.elastic.clients.elasticsearch._types.SortOptions;
 import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.aggregations.CompositeAggregationSource;
+import co.elastic.clients.elasticsearch._types.query_dsl.Operator;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
-import co.elastic.clients.json.JsonpDeserializer;
 import io.quarkus.logging.Log;
 import io.quarkus.runtime.StartupEvent;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -52,6 +53,10 @@ public class PhenotypeRepository {
         public String gene;
     }
 
+    public static class PhenotypeAggregationQueryResult extends QueryResult<PhenotypeAggregation> {
+        public String searchAfter;
+    }
+
     @ConfigProperty(name = "phenotypeservice.elasticsearch.index-prefix")
     String indexPrefix;
 
@@ -68,27 +73,32 @@ public class PhenotypeRepository {
     @Inject
     ObjectMapper objectMapper;
 
-    @Inject
-    JsonpDeserializer<Phenotype> phenotypeDeserializer;
-
     void init(@Observes StartupEvent event) throws IOException {
         initPipeline();
         initIndexTemplate();
         loadIBeetlePhenotypes();
     }
 
-    public void search(String query) throws IOException {
+    public PhenotypeAggregationQueryResult search(String query, String searchAfter) throws IOException {
         var response = esClient.search(s -> s
             .size(0)
+            .index(getIndexAlias())
             .query(q -> q
-                .queryString(qs -> qs.query(query))
+                .queryString(qs -> qs
+                    .query(query)
+                    .defaultOperator(Operator.And)
+                )
             )
             .aggregations("genes", a -> a
-                .composite(c -> c
-                    .sources(List.of(
+                .composite(c -> {
+                    c.sources(List.of(
                         Map.of("gene", CompositeAggregationSource.of(cs -> cs.terms(tt -> tt.field("gene.keyword"))))
-                    ))
-                )
+                    ));
+                    if (searchAfter != null && !searchAfter.isBlank()) {
+                        c.after("gene", FieldValue.of(searchAfter));
+                    }
+                    return c;
+                })
                 .aggregations("top_phenotypes", aa -> aa.topHits(th -> th.size(10)))
                 .aggregations("max_score", aa -> aa
                     .max(m -> m
@@ -103,7 +113,8 @@ public class PhenotypeRepository {
             )
         , Phenotype.class);
         var genes = response.aggregations().get("genes").composite();
-        var searchResult = new QueryResult<PhenotypeAggregation>();
+        var searchResult = new PhenotypeAggregationQueryResult();
+        searchResult.searchAfter = Optional.ofNullable(genes.afterKey().get("gene")).map(v -> v.stringValue()).orElse(null);
         searchResult.total = Optional.ofNullable(response.hits().total())
             .map(t -> t.value())
             .orElseThrow(() -> new RuntimeException("No total in response"));
@@ -115,25 +126,25 @@ public class PhenotypeRepository {
                 agg.data = b.aggregations().get("top_phenotypes").topHits().hits().hits().stream()
                     .map(s -> s.source())
                     .filter(s -> s != null)
-                    .map(s -> s.deserialize(phenotypeDeserializer))
+                    .map(s -> s.to(Phenotype.class))
                     .toList();
                 return agg;
             }).toList();
+        return searchResult;
     }
     
     public Phenotype create(Phenotype phenotype, List<File> images) throws IOException {
-        List<String> imageIds;
         if (images.size() > 0) {
             // Upload each image in a separate request because multiple images don't work.
             // Quarkus issue.
-            imageIds = images.stream()
+            phenotype.imageIds = images.stream()
                 .map(imageServiceClient::upload)
                 .flatMap(List::stream)
-                .map(metadata -> metadata.id).toList();
+                .map(i -> i.id)
+                .toList();
         } else {
-            imageIds = List.of();
+            phenotype.imageIds = List.of();
         }
-        phenotype.imageIds = imageIds;
         esClient.index(i -> i
             .index(getCommunityIndex())
             .document(phenotype)
@@ -221,14 +232,20 @@ public class PhenotypeRepository {
     }
 
     private void initIndexTemplate() throws IOException {
-        esClient.indices().putIndexTemplate(t -> t
-            .name(indexPrefix + "-template")
-            .indexPatterns(indexPrefix + "-*")
-            .template(tt -> tt
-                .settings(s -> s.defaultPipeline(indexPrefix + "-pipeline"))
-                .aliases(indexPrefix, a -> a)
-            )
-        );
+        try {
+            esClient.indices().putIndexTemplate(t -> t
+                .name(indexPrefix + "-template")
+                .indexPatterns(indexPrefix + "-*")
+                .template(tt -> tt
+                    .settings(s -> s.defaultPipeline(indexPrefix + "-pipeline"))
+                    .aliases(indexPrefix, a -> a)
+                )
+            );
+        } catch (Exception e) {
+            Log.error("Failed to create index template", e);
+            throw e;
+        }
+
     }
 
     private void initPipeline() throws IOException {

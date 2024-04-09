@@ -21,7 +21,7 @@ public class Phenotype {
     }
 
     public static enum Status {
-        PENDING, APPROVED, REJECTED
+        PENDING, APPROVED
     }
 
     public static class DsRNA {
@@ -102,7 +102,7 @@ public class Phenotype {
     public List<String> imageIds;
 
     public String topic;
-    public String dayPostInjection;
+    public Integer dayPostInjection;
     public String comment;
 
     @Null(groups = ValidationGroups.Create.class)
