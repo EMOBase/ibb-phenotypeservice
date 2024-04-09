@@ -6,18 +6,19 @@ import java.util.List;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.Operator;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import co.elastic.clients.elasticsearch._types.query_dsl.SimpleQueryStringFlag;
 import co.elastic.clients.json.jackson.JacksonJsonProvider;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 
 /**
  * Parse a query string into an Elasticsearch query to search for phenotype groups.
- * 
  * Grammar:
+ * 
  * <pre>
- *  expr -> term ( OR term )*
- *  term -> factor ( AND factor )*
- *  factor -> NOT factor | operand
- *  operand -> PHRASE | LPAREN expr RPAREN
+ * expr -> term (OR expr)?
+ * term -> factor (AND term)?
+ * factor -> NOT factor | operand
+ * operand -> PHRASE | LPAREN expr RPAREN
  * </pre>
  */
 public class QueryParser {
@@ -32,10 +33,9 @@ public class QueryParser {
         List<Query> queries = new ArrayList<>();
         queries.add(term());
         Token token = tokenizer.peek();
-        while (token.getType() == Token.Type.OR) {
+        if (token.getType() == Token.Type.OR) {
             tokenizer.next();
-            queries.add(term());
-            token = tokenizer.peek();
+            queries.add(expr());
         }
         if (queries.size() == 1) {
             return queries.get(0);
@@ -48,10 +48,9 @@ public class QueryParser {
         List<Query> queries = new ArrayList<>();
         queries.add(factor());
         Token token = tokenizer.peek();
-        while (token.getType() == Token.Type.AND) {
+        if (token.getType() == Token.Type.AND) {
             tokenizer.next();
-            queries.add(factor());
-            token = tokenizer.peek();
+            queries.add(term());
         }
         if (queries.size() == 1) {
             return queries.get(0);
@@ -89,6 +88,7 @@ public class QueryParser {
                         .simpleQueryString(q3 -> q3
                             .query(phrase)
                             .defaultOperator(Operator.And)
+                            .flags(SimpleQueryStringFlag.And, SimpleQueryStringFlag.Not, SimpleQueryStringFlag.Phrase)
                             .fields("phenotypes.description")
                         )
                     )
@@ -101,7 +101,8 @@ public class QueryParser {
     }
 
     public static void main(String[] args) throws Exception {
-        String queryString = "head -smaller OR leg AND NOT wing closed";
+        // String queryString = "(head -smaller OR leg) AND NOT wing closed";
+        String queryString = "((head -smaller OR leg)) AND NOT wing closed";
         QueryParser parser = new QueryParser();
         Query query = parser.parse(queryString);
         StringWriter writer = new StringWriter();

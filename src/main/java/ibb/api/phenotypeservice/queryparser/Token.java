@@ -1,5 +1,7 @@
 package ibb.api.phenotypeservice.queryparser;
 
+import java.util.Objects;
+
 public class Token {
     public static enum Type {
         AND, OR, NOT, LPAREN, RPAREN, PHRASE, END
@@ -24,5 +26,24 @@ public class Token {
         } else {
             return type.toString();
         }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        } else if (this == obj) {
+            return true;
+        } else if (obj instanceof Token) {
+            Token other = (Token) obj;
+            return type == other.type && value.equals(other.value);
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(type, value);
     }
 }

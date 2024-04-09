@@ -2,13 +2,13 @@ package ibb.api.phenotypeservice.queryparser;
 
 public class Tokenizer {
 
-    private static final Token AND = new Token(Token.Type.AND, "AND");
-    private static final Token OR = new Token(Token.Type.OR, "OR");
-    private static final Token NOT = new Token(Token.Type.NOT, "NOT");
-    private static final Token LPAREN = new Token(Token.Type.LPAREN, "(");
-    private static final Token RPAREN = new Token(Token.Type.RPAREN, ")");
-    private static final Token END = new Token(Token.Type.END, "");
-    private static Token PHRASE(String value) {
+    public static final Token AND = new Token(Token.Type.AND, "AND");
+    public static final Token OR = new Token(Token.Type.OR, "OR");
+    public static final Token NOT = new Token(Token.Type.NOT, "NOT");
+    public static final Token LPAREN = new Token(Token.Type.LPAREN, "(");
+    public static final Token RPAREN = new Token(Token.Type.RPAREN, ")");
+    public static final Token END = new Token(Token.Type.END, "");
+    public static Token PHRASE(String value) {
         return new Token(Token.Type.PHRASE, value);
     }
 
@@ -33,9 +33,6 @@ public class Tokenizer {
     }
 
     private String findNextWord() {
-        while (pos < query.length() && query.charAt(pos) == ' ') {
-            pos++;
-        }
         int start = pos;
         while (pos < query.length() && query.charAt(pos) != ' ' && query.charAt(pos) != '(' && query.charAt(pos) != ')') {
             pos++;
@@ -44,6 +41,9 @@ public class Tokenizer {
     }
 
     private Token findNextToken() {
+        while (pos < query.length() && query.charAt(pos) == ' ') {
+            pos++;
+        }
         if (pos >= query.length()) {
             return END;
         } else if (query.charAt(pos) == '(') {
@@ -74,7 +74,7 @@ public class Tokenizer {
     }
 
     public static void main(String[] args) {
-        Tokenizer tokenizer = new Tokenizer("(head smaller OR leg) AND NOT wing closed");
+        Tokenizer tokenizer = new Tokenizer("leg (shortened | not present) OR (leg AND NOT wing closed)");
         Token token = tokenizer.next();
         while (token.getType() != Token.Type.END) {
             System.out.println(token);
