@@ -1,4 +1,4 @@
-package ibb.api.phenotypeservice;
+package ibb.api.phenotypeservice.core;
 
 import java.time.Instant;
 import java.util.List;
@@ -20,8 +20,12 @@ public class Phenotype {
         public static interface Create {}
     }
 
-    public static enum Status {
-        PENDING, APPROVED
+    public static class ImageMetadata {
+        public static enum Status {
+            PENDING, APPROVED
+        }
+        public String id;
+        public Status status;
     }
 
     public static class DsRNA {
@@ -101,15 +105,15 @@ public class Phenotype {
     @Null(groups = ValidationGroups.Create.class)
     public List<String> imageIds;
 
+    @Null(groups = ValidationGroups.Create.class)
+    public List<ImageMetadata> images;
+
     public String topic;
     public Integer dayPostInjection;
     public String comment;
 
     @Null(groups = ValidationGroups.Create.class)
     public boolean iBeetle = false;
-
-    @Null(groups = ValidationGroups.Create.class)
-    public Status status = Status.PENDING;
 
     @Null(groups = ValidationGroups.Create.class)
     public Instant createdAt;

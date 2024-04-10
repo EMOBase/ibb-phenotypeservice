@@ -2,22 +2,16 @@ package ibb.api.phenotypeservice;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicLong;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch._helpers.bulk.BulkIngester;
 import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.Refresh;
 import co.elastic.clients.elasticsearch._types.SortOptions;
@@ -25,10 +19,10 @@ import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.aggregations.CompositeAggregationSource;
 import co.elastic.clients.elasticsearch._types.query_dsl.Operator;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
+import ibb.api.phenotypeservice.core.ImageServiceClient;
+import ibb.api.phenotypeservice.core.Phenotype;
 import io.quarkus.logging.Log;
-import io.quarkus.runtime.StartupEvent;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
 
 @ApplicationScoped
@@ -73,11 +67,11 @@ public class PhenotypeRepository {
     @Inject
     ObjectMapper objectMapper;
 
-    void init(@Observes StartupEvent event) throws IOException {
-        initPipeline();
-        initIndexTemplate();
-        loadIBeetlePhenotypes();
-    }
+    // void init(@Observes StartupEvent event) throws IOException {
+    //     initPipeline();
+    //     initIndexTemplate();
+    //     loadIBeetlePhenotypes();
+    // }
 
     public PhenotypeAggregationQueryResult search(String query, String searchAfter) throws IOException {
         var response = esClient.search(s -> s
@@ -180,39 +174,6 @@ public class PhenotypeRepository {
         return QueryResult.of(response);
     }
 
-    public void reject(List<String> ids) throws IOException {
-        List<String> imageIds = findCommunityPhenotypeByIds(ids).data.stream()
-            .map(p -> p.imageIds)
-            .flatMap(List::stream)
-            .toList();
-        if (imageIds.size() > 0) {
-            imageServiceClient.reject(imageIds);
-        }
-        esClient.deleteByQuery(d -> d
-            .index(getCommunityIndex())
-            .ignoreUnavailable(true)
-            .query(q -> q.ids(i -> i.values(ids)))
-            .refresh(true)
-        );
-    }
-
-    public void approve(List<String> ids) throws IOException {
-        List<String> imageIds = findCommunityPhenotypeByIds(ids).data.stream()
-            .map(p -> p.imageIds)
-            .flatMap(List::stream)
-            .toList();
-        if (imageIds.size() > 0) {
-            imageServiceClient.approve(imageIds);
-        }
-        esClient.updateByQuery(d -> d
-            .index(getCommunityIndex())
-            .ignoreUnavailable(true)
-            .query(q -> q.ids(i -> i.values(ids)))
-            .script(s -> s.inline(i -> i.source("ctx._source.status = 'APPROVED'")))
-            .refresh(true)
-        );
-    }
-
     private QueryResult<Phenotype> findCommunityPhenotypeByIds(List<String> ids) throws IOException {
         var response = esClient.search(s -> s
             .index(getCommunityIndex())
@@ -267,42 +228,5 @@ public class PhenotypeRepository {
                 .override(false)
             ))
         );
-    }
-
-    private void loadIBeetlePhenotypes() throws IOException {
-        String indexName = indexPrefix + "-ibeetle";
-        if (esClient.indices().exists(r -> r.index(indexName)).value()) {
-            Log.infov("Index {0} already exists, skipping loading data", indexName);
-            return;
-        }
-
-        Path dataPath = Paths.get(dataDir, "iBeetle_phenotypes.ndjson");
-        try (
-            var br = Files.newBufferedReader(dataPath);
-            BulkIngester<Void> ingester = BulkIngester.of(b -> b.client(esClient))
-        ) {
-            Log.infov("Loading data from {0} into index {1}", dataPath, indexName);
-            AtomicLong counter = new AtomicLong();
-            br.lines().forEach(line -> {
-                counter.incrementAndGet();
-                Phenotype phenotype;
-                try {
-                    phenotype = objectMapper.readValue(line, Phenotype.class);
-                    phenotype.iBeetle = true;
-                    phenotype.status = Phenotype.Status.APPROVED;
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException("Failed to parse JSON at line " + counter.get() + ":", e);
-                }
-                ingester.add(op -> op
-                    .index(idx -> idx
-                        .id(phenotype.id)
-                        .index(indexName)
-                        .document(phenotype)
-                    )
-                );
-            });
-        }
-        esClient.indices().refresh(r -> r.index(indexName));
-        Log.infov("Loaded {0} phenotypes", esClient.count(r -> r.index(indexName)).count());
     }
 }

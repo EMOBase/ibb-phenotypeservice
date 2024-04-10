@@ -18,7 +18,11 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
-import ibb.api.phenotypeservice.Phenotype.OntologyTerm;
+import ibb.api.phenotypeservice.core.ImageServiceClient;
+import ibb.api.phenotypeservice.core.Phenotype;
+import ibb.api.phenotypeservice.core.Phenotype.ImageMetadata;
+import ibb.api.phenotypeservice.core.Phenotype.OntologyTerm;
+import ibb.api.phenotypeservice.rest.PhenotypeEndpoints;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusMock;
 import io.quarkus.test.junit.QuarkusTest;
@@ -41,10 +45,9 @@ public class PhenotypeServiceTest {
             }
 
             @Override
-            public void reject(List<String> ids) {}
-
-            @Override
-            public void approve(List<String> ids) {}
+            public List<ImageMetadata> getMetadata(List<String> ids) {
+                return null;
+            }
         };
         QuarkusMock.installMockForType(imageService, ImageServiceClient.class, RestClient.LITERAL);
     }

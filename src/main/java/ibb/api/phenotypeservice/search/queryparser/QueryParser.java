@@ -1,8 +1,9 @@
-package ibb.api.phenotypeservice.queryparser;
+package ibb.api.phenotypeservice.search.queryparser;
 
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.Operator;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
@@ -23,6 +24,7 @@ import co.elastic.clients.json.jackson.JacksonJsonpMapper;
  */
 public class QueryParser {
     private Tokenizer tokenizer;
+    private boolean randomizeInnerHitKeys = true;
 
     public Query parse(String query) throws QueryParserException {
         tokenizer = new Tokenizer(query);
@@ -81,6 +83,7 @@ public class QueryParser {
             return query;
         } else if (token.getType() == Token.Type.PHRASE) {
             String phrase = token.getValue();
+            String innerHitKey = randomizeInnerHitKeys ? UUID.randomUUID().toString() : phrase;
             return Query.of(q -> q
                 .nested(n -> n
                     .path("phenotypes")
@@ -92,7 +95,7 @@ public class QueryParser {
                             .fields("phenotypes.description")
                         )
                     )
-                    .innerHits(h -> h.name(phrase).size(10))
+                    .innerHits(h -> h.name(innerHitKey).size(10))
                 )
             );
         } else {

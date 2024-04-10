@@ -1,11 +1,11 @@
 package ibb.api.phenotypeservice.queryparser;
 
-import static ibb.api.phenotypeservice.queryparser.Tokenizer.AND;
-import static ibb.api.phenotypeservice.queryparser.Tokenizer.LPAREN;
-import static ibb.api.phenotypeservice.queryparser.Tokenizer.NOT;
-import static ibb.api.phenotypeservice.queryparser.Tokenizer.OR;
-import static ibb.api.phenotypeservice.queryparser.Tokenizer.PHRASE;
-import static ibb.api.phenotypeservice.queryparser.Tokenizer.RPAREN;
+import static ibb.api.phenotypeservice.search.queryparser.Tokenizer.AND;
+import static ibb.api.phenotypeservice.search.queryparser.Tokenizer.LPAREN;
+import static ibb.api.phenotypeservice.search.queryparser.Tokenizer.NOT;
+import static ibb.api.phenotypeservice.search.queryparser.Tokenizer.OR;
+import static ibb.api.phenotypeservice.search.queryparser.Tokenizer.PHRASE;
+import static ibb.api.phenotypeservice.search.queryparser.Tokenizer.RPAREN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
@@ -15,6 +15,9 @@ import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+
+import ibb.api.phenotypeservice.search.queryparser.Token;
+import ibb.api.phenotypeservice.search.queryparser.Tokenizer;
 
 public class TokenizerTest {
 

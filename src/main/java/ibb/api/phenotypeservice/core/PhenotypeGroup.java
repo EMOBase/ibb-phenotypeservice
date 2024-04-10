@@ -1,4 +1,4 @@
-package ibb.api.phenotypeservice;
+package ibb.api.phenotypeservice.core;
 
 import java.util.List;
 

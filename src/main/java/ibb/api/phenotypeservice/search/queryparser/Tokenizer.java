@@ -1,4 +1,4 @@
-package ibb.api.phenotypeservice.queryparser;
+package ibb.api.phenotypeservice.search.queryparser;
 
 public class Tokenizer {
 

@@ -1,4 +1,4 @@
-package ibb.api.phenotypeservice;
+package ibb.api.phenotypeservice.core;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -13,16 +13,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._helpers.bulk.BulkIngester;
 import io.quarkus.logging.Log;
-import io.quarkus.runtime.StartupEvent;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
 
 @ApplicationScoped
-public class PhenotypeGroupLoader {
-
-    @ConfigProperty(name = "phenotypeservice.elasticsearch.index-prefix")
-    String indexPrefix;
+public class IBeetlePhenotypeLoader {
 
     @ConfigProperty(name = "data.dir")
     String dataDir;
@@ -33,14 +28,7 @@ public class PhenotypeGroupLoader {
     @Inject
     ElasticsearchClient esClient;
 
-    void loadIBeetlePhenotypes(@Observes StartupEvent ev) throws IOException {
-        String indexName = "test";
-        // String indexName = indexPrefix + "-ibeetle";
-        if (esClient.indices().exists(r -> r.index(indexName)).value()) {
-            Log.infov("Index {0} already exists, skipping loading data", indexName);
-            return;
-        }
-
+    public void loadIBeetlePhenotypes(String indexName) throws IOException {
         Path dataPath = Paths.get(dataDir, "iBeetle_grouped_phenotypes.ndjson");
         try (
             var br = Files.newBufferedReader(dataPath);
