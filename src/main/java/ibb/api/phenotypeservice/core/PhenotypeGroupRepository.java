@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import ibb.api.phenotypeservice.core.Phenotype.ImageMetadata;
+import ibb.api.phenotypeservice.helper.ESHelper;
 import ibb.api.phenotypeservice.search.PhenotypeGroupSearchResult;
 import ibb.api.phenotypeservice.search.PhenotypeGroupSearchResultConverter;
 import ibb.api.phenotypeservice.search.queryparser.QueryParser;
@@ -64,6 +65,7 @@ public class PhenotypeGroupRepository {
 
     public PhenotypeGroupSearchResult search(String queryString) throws QueryParserException, IOException {
         Query query = new QueryParser().parse(queryString);
+        Log.debug(ESHelper.serializeToJSON(query));
         var response = esClient.search(r -> r
             .index(indexName)
             .source(s -> s.filter(f -> f.includes("gene")))

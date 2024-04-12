@@ -91,7 +91,7 @@ public class QueryParser {
                         .simpleQueryString(q3 -> q3
                             .query(phrase)
                             .defaultOperator(Operator.And)
-                            .flags(SimpleQueryStringFlag.And, SimpleQueryStringFlag.Not, SimpleQueryStringFlag.Phrase)
+                            .flags(SimpleQueryStringFlag.Whitespace, SimpleQueryStringFlag.Not, SimpleQueryStringFlag.Phrase)
                             .fields("phenotypes.description")
                         )
                     )
