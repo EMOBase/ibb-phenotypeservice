@@ -10,6 +10,7 @@ import ibb.api.phenotypeservice.search.queryparser.QueryParserException;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 
@@ -21,9 +22,11 @@ public class PhenotypeGroupEndpoints {
 
     @GET
     @Path("/search")
-    public PhenotypeGroupSearchResult search(@RestQuery @NotBlank String query) throws IOException {
+    public PhenotypeGroupSearchResult search(@RestQuery @NotBlank String query,
+        @RestQuery @DefaultValue("0") int from, @RestQuery @DefaultValue("20") int size
+    ) throws IOException {
         try {
-            return phenotypeGroupRepository.search(query);
+            return phenotypeGroupRepository.search(query, from, size);
         } catch (QueryParserException e) {
             throw new BadRequestException("query is invalid", e);
         }

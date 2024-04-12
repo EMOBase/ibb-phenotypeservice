@@ -90,12 +90,14 @@ public class QueryParser {
                     .query(q2 -> q2
                         .simpleQueryString(q3 -> q3
                             .query(phrase)
+                            .autoGenerateSynonymsPhraseQuery(false)
                             .defaultOperator(Operator.And)
                             .flags(SimpleQueryStringFlag.Whitespace, SimpleQueryStringFlag.Not, SimpleQueryStringFlag.Phrase)
-                            .fields("phenotypes.description")
+                            .fields("phenotypes.description", "phenotypes.structures.termName")
+                            .analyzer("phenotype_search_analyzer")
                         )
                     )
-                    .innerHits(h -> h.name(innerHitKey).size(10))
+                    .innerHits(h -> h.name(innerHitKey).size(100))
                 )
             );
         } else {

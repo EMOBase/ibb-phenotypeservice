@@ -1,4 +1,4 @@
-package ibb.api.phenotypeservice.core;
+package ibb.api.phenotypeservice.loader;
 
 import java.io.IOException;
 import java.nio.file.Files;

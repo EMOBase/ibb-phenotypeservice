@@ -16,6 +16,8 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import ibb.api.phenotypeservice.core.Phenotype.ImageMetadata;
 import ibb.api.phenotypeservice.helper.ESHelper;
+import ibb.api.phenotypeservice.loader.IBeetlePhenotypeLoader;
+import ibb.api.phenotypeservice.loader.SynonymLoader;
 import ibb.api.phenotypeservice.search.PhenotypeGroupSearchResult;
 import ibb.api.phenotypeservice.search.PhenotypeGroupSearchResultConverter;
 import ibb.api.phenotypeservice.search.queryparser.QueryParser;
@@ -29,7 +31,7 @@ import jakarta.inject.Inject;
 
 @ApplicationScoped
 public class PhenotypeGroupRepository {
-    
+
     @ConfigProperty(name = "phenotypeservice.elasticsearch.index-prefix")
     String indexPrefix;
 
@@ -49,6 +51,9 @@ public class PhenotypeGroupRepository {
     @Inject
     IBeetlePhenotypeLoader phenotypeGroupLoader;
 
+    @Inject
+    SynonymLoader synonymLoader;
+
     private String indexName;
 
     @PostConstruct
@@ -63,13 +68,15 @@ public class PhenotypeGroupRepository {
         createIndexIfNotExists();
     }
 
-    public PhenotypeGroupSearchResult search(String queryString) throws QueryParserException, IOException {
+    public PhenotypeGroupSearchResult search(String queryString, int from, int size) throws QueryParserException, IOException {
         Query query = new QueryParser().parse(queryString);
         Log.debug(ESHelper.serializeToJSON(query));
         var response = esClient.search(r -> r
-            .index(indexName)
-            .source(s -> s.filter(f -> f.includes("gene")))
-            .query(query), PhenotypeGroup.class);
+                .index(indexName)
+                .from(from)
+                .size(size)
+                .source(s -> s.filter(f -> f.includes("gene")))
+                .query(query), PhenotypeGroup.class);
         var converter = new PhenotypeGroupSearchResultConverter();
         return converter.convert(response);
     }
@@ -87,22 +94,23 @@ public class PhenotypeGroupRepository {
 
     private void fillImageMetadata(List<Phenotype> phenotypes) {
         Map<String, List<Phenotype>> imageIdToPhenotypes = phenotypes.stream()
-            .flatMap(p -> p.imageIds.stream().map(i -> Map.entry(i, p)))
-            .collect(Collectors.groupingBy(Map.Entry::getKey, Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
-    
+                .flatMap(p -> p.imageIds.stream().map(i -> Map.entry(i, p)))
+                .collect(Collectors.groupingBy(Map.Entry::getKey,
+                        Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
+
         List<String> imageIds = imageIdToPhenotypes.keySet().stream().toList();
         List<ImageMetadata> imageMetadatas = imageServiceClient.getMetadata(imageIds);
 
         imageMetadatas.stream()
-            .filter(im -> imageIdToPhenotypes.containsKey(im.id))
-            .forEach(im -> {
-                imageIdToPhenotypes.get(im.id).forEach(p -> {
-                    if (p.images == null) {
-                        p.images = new ArrayList<>();
-                    }
-                    p.images.add(im);
+                .filter(im -> imageIdToPhenotypes.containsKey(im.id))
+                .forEach(im -> {
+                    imageIdToPhenotypes.get(im.id).forEach(p -> {
+                        if (p.images == null) {
+                            p.images = new ArrayList<>();
+                        }
+                        p.images.add(im);
+                    });
                 });
-            });
     }
 
     private void createIndexIfNotExists() throws IOException {
@@ -111,9 +119,23 @@ public class PhenotypeGroupRepository {
             Log.infov("Index {0} already exists, skipping loading data", indexName);
             return;
         }
-        esClient.indices().create(r -> r.index(indexName).mappings(m -> m
-            .properties("phenotypes", p -> p.nested(n -> n))
-        ));
+        List<String> synonyms = synonymLoader.getSynonyms();
+        esClient.indices().create(r -> r.index(indexName)
+                .settings(s -> s
+                        .analysis(a -> a
+                                .filter("synonym_filter",
+                                        f -> f.definition(d -> d.synonymGraph(sg -> sg.synonyms(synonyms))))
+                                .analyzer("phenotype_search_analyzer", aa -> aa.custom(c -> c
+                                        .tokenizer("standard")
+                                        .filter("lowercase", "synonym_filter")))))
+                .mappings(m -> m
+                        .properties("phenotypes", p -> p.nested(n -> n))
+                        .properties("structures", p -> p.object(o -> o
+                                .properties("termName", pp -> pp.text(t -> t
+                                        .searchAnalyzer("phenotype_search_analyzer")
+                                ))
+                        ))        
+                ));
         phenotypeGroupLoader.loadIBeetlePhenotypes(indexName);
     }
 
