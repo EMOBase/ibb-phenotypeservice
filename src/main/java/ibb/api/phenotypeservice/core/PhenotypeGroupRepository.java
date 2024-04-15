@@ -78,7 +78,10 @@ public class PhenotypeGroupRepository {
                 .source(s -> s.filter(f -> f.includes("gene")))
                 .query(query), PhenotypeGroup.class);
         var converter = new PhenotypeGroupSearchResultConverter();
-        return converter.convert(response);
+        var result = converter.convert(response);
+        List<Phenotype> phenotypes = result.data.stream().flatMap(pg -> pg.phenotypes.stream()).toList();
+        fillImageMetadata(phenotypes);
+        return result;
     }
 
     public Phenotype addPhenotype(Phenotype phenotype, List<File> images) throws IOException {

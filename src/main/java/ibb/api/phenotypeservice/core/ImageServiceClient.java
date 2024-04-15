@@ -24,6 +24,6 @@ public interface ImageServiceClient {
     public List<ImageMetadata> upload(@RestForm File images);
 
     @POST
-    @Path("/image-metadata")
+    @Path("/image-metadata/get")
     public List<ImageMetadata> getMetadata(List<String> ids);
 }
