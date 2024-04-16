@@ -3,6 +3,7 @@ package ibb.api.phenotypeservice.rest;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.Matchers.everyItem;
 import static org.hamcrest.Matchers.nullValue;
 
 import java.io.File;
@@ -61,6 +62,21 @@ public class PhenotypeEndpointsTest {
     }
 
     @Test
+    @Order(Timeline.INITIAL)
+    public void shouldFindIBeetlePhenotypes() {
+        RestAssured
+            .given()
+                .pathParam("gene", "TC000618")
+            .when()
+                .get("/by-gene/{gene}")
+            .then()
+                .statusCode(200)
+                .body("size()", is(12))
+                .body("phenotypes.iBeetle", everyItem(is(true)))
+                ;
+    }
+
+    @Test
     @Order(Timeline.BEFORE_CREATE_PHENOTYPE)
     public void shouldCreatePhenotype() {
         Phenotype phenotype = createValidPhenotype();
@@ -70,6 +86,24 @@ public class PhenotypeEndpointsTest {
                 .multiPart("phenotype", phenotype, "application/json")
                 .multiPart("images", images[0], "image/jpeg")
                 .multiPart("images", images[1], "image/jpeg")
+            .when()
+                .post()
+            .then()
+                .body("violations", nullValue())
+                .statusCode(200)
+                .body("id", notNullValue())
+            .extract()
+                .as(Phenotype.class).id;
+    }
+
+    @Test
+    @Order(Timeline.BEFORE_CREATE_PHENOTYPE)
+    public void shouldAddPhenotypeToExistingPhenotypeGroup() {
+        Phenotype phenotype = createValidPhenotype();
+        phenotype.gene = "TC000618";
+        phenotypeId = RestAssured
+            .given()
+                .multiPart("phenotype", phenotype, "application/json")
             .when()
                 .post()
             .then()
@@ -95,6 +129,20 @@ public class PhenotypeEndpointsTest {
                 .body("[0].id", equalTo(phenotypeId))
                 .body("[0].dsRNA.sequence", equalTo("ATGCG"))
                 .body("[0].imageIds.size()", equalTo(2));
+    }
+
+    @Test
+    @Order(Timeline.AFTER_CREATE_PHENOTYPE)
+    public void shouldFindPhenotypesByGeneThatHasIBeetlePhenotypes() {
+    
+        RestAssured
+            .given()
+                .pathParam("gene", "TC000618")
+            .when()
+                .get("/by-gene/{gene}")
+            .then()
+                .statusCode(200)
+                .body("size()", is(13));
     }
 
     @Test
