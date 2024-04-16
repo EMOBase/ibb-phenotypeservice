@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._helpers.bulk.BulkIngester;
+import ibb.api.phenotypeservice.core.PhenotypeGroup;
 import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -39,9 +40,11 @@ public class IBeetlePhenotypeLoader {
                 ingester.add(op -> op
                     .index(idx -> {
                         try {
+                            PhenotypeGroup pg = objectMapper.readValue(line, PhenotypeGroup.class);
                             return idx
                                 .index(indexName)
-                                .document(objectMapper.readTree(line));
+                                .id(pg.gene)
+                                .document(pg);
                         } catch (JsonProcessingException e) {
                             throw new RuntimeException(e);
                         }

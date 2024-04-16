@@ -2,9 +2,12 @@ package ibb.api.phenotypeservice.core;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -13,7 +16,9 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.Refresh;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import co.elastic.clients.json.JsonData;
 import ibb.api.phenotypeservice.core.Phenotype.ImageMetadata;
 import ibb.api.phenotypeservice.helper.ESHelper;
 import ibb.api.phenotypeservice.loader.IBeetlePhenotypeLoader;
@@ -37,6 +42,9 @@ public class PhenotypeGroupRepository {
 
     @ConfigProperty(name = "phenotypeservice.elasticsearch.delete-index-on-start", defaultValue = "false")
     boolean deleteIndexOnStart;
+
+    @ConfigProperty(name = "data.load-ibeetle", defaultValue = "true")
+    boolean loadIBeetleData;
 
     @Inject
     ObjectMapper objectMapper;
@@ -68,8 +76,8 @@ public class PhenotypeGroupRepository {
         createIndexIfNotExists();
     }
 
-    public PhenotypeGroupSearchResult search(String queryString, int from, int size) throws QueryParserException, IOException {
-        Query query = new QueryParser().parse(queryString);
+    public PhenotypeGroupSearchResult search(String queryString, Float penetrance, int from, int size) throws QueryParserException, IOException {
+        Query query = new QueryParser().withDefaultPenetrance(penetrance).parse(queryString);
         Log.debug(ESHelper.serializeToJSON(query));
         var response = esClient.search(r -> r
                 .index(indexName)
@@ -85,14 +93,78 @@ public class PhenotypeGroupRepository {
     }
 
     public Phenotype addPhenotype(Phenotype phenotype, List<File> images) throws IOException {
-        return null;
+        List<ImageMetadata> imageMetadatas;
+        if (images != null && !images.isEmpty()) {
+            imageMetadatas = images.stream()
+                .map(imageServiceClient::upload)
+                .flatMap(List::stream)
+                .toList();
+        } else {
+            imageMetadatas = List.of();
+        }
+        phenotype.id = UUID.randomUUID().toString();
+        phenotype.createdAt = Instant.now();
+        String gene = phenotype.gene;
+
+        phenotype.gene = null;
+        phenotype.imageIds = imageMetadatas.stream().map(im -> im.id).toList();
+        PhenotypeGroup newPhenotypeGroup = new PhenotypeGroup();
+        newPhenotypeGroup.gene = gene;
+        newPhenotypeGroup.phenotypes = List.of(phenotype);
+
+        esClient.update(u -> u
+            .index(indexName)
+            .id(gene)
+            .refresh(Refresh.True)
+            .script(s -> s.inline(i -> i
+                .source("ctx._source.phenotypes.add(params.phenotype)")
+                .params("phenotype", JsonData.of(phenotype))))
+            .upsert(newPhenotypeGroup)
+        , PhenotypeGroup.class);
+
+        phenotype.imageIds = null;
+        phenotype.images = imageMetadatas;
+        return phenotype;
     }
 
     public void deletePhenotype(String id) throws IOException {
+        List<String> imageIds = esClient.search(r -> r
+            .index(indexName)
+            .query(q -> q.nested(n -> n
+                .path("phenotypes")
+                .query(q2 -> q2.term(t -> t.field("phenotypes.id.keyword").value(id))))
+            )
+            , PhenotypeGroup.class)
+            .hits().hits().stream()
+            .map(h -> h.source())
+            .filter(pg -> pg != null && pg.phenotypes != null)
+            .flatMap(pg -> pg.phenotypes.stream())
+            .filter(p -> Objects.equals(p.id, id) && p.imageIds != null)
+            .flatMap(p -> p.imageIds.stream())
+            .toList();
+        if (!imageIds.isEmpty()) {
+            imageServiceClient.reject(imageIds);
+        }
+        
+        esClient.updateByQuery(u -> u
+            .index(indexName)
+            .refresh(true)
+            .query(q -> q.nested(n -> n
+                .path("phenotypes")
+                .query(q2 -> q2.term(t -> t.field("phenotypes.id.keyword").value(id)))))
+            .script(s -> s.inline(i -> i
+                .source("ctx._source.phenotypes.removeIf(p -> p.id == params.id)")
+                .params("id", JsonData.of(id))))
+        );
     }
 
     public List<Phenotype> findByGene(String gene) throws IOException {
-        return null;
+        var pg = esClient.get(g -> g.id(gene).index(indexName), PhenotypeGroup.class)
+            .source();
+        if (pg == null) {
+            return List.of();
+        }
+        return pg.phenotypes;
     }
 
     private void fillImageMetadata(List<Phenotype> phenotypes) {
@@ -102,8 +174,11 @@ public class PhenotypeGroupRepository {
                         Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
 
         List<String> imageIds = imageIdToPhenotypes.keySet().stream().toList();
-        List<ImageMetadata> imageMetadatas = imageServiceClient.getMetadata(imageIds);
+        if (imageIds.isEmpty()) {
+            return;
+        }
 
+        List<ImageMetadata> imageMetadatas = imageServiceClient.getMetadata(imageIds);
         imageMetadatas.stream()
                 .filter(im -> imageIdToPhenotypes.containsKey(im.id))
                 .forEach(im -> {
@@ -133,16 +208,13 @@ public class PhenotypeGroupRepository {
                                         .filter("lowercase", "synonym_filter")))))
                 .mappings(m -> m
                         .properties("phenotypes", p -> p.nested(n -> n))
-                        .properties("structures", p -> p.object(o -> o
-                                .properties("termName", pp -> pp.text(t -> t
-                                        .searchAnalyzer("phenotype_search_analyzer")
-                                ))
-                        ))        
                 ));
-        phenotypeGroupLoader.loadIBeetlePhenotypes(indexName);
+        if (loadIBeetleData) {
+            phenotypeGroupLoader.loadIBeetlePhenotypes(indexName);
+        }
     }
 
-    private String getIndexName() {
+    public String getIndexName() {
         return indexPrefix + "-phenotypegroups";
     }
 }

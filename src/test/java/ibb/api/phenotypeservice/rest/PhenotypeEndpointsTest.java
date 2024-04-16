@@ -1,15 +1,15 @@
-package ibb.api.phenotypeservice;
+package ibb.api.phenotypeservice.rest;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.junit.jupiter.api.BeforeAll;
@@ -20,35 +20,20 @@ import org.junit.jupiter.api.TestMethodOrder;
 
 import ibb.api.phenotypeservice.core.ImageServiceClient;
 import ibb.api.phenotypeservice.core.Phenotype;
-import ibb.api.phenotypeservice.core.Phenotype.ImageMetadata;
 import ibb.api.phenotypeservice.core.Phenotype.OntologyTerm;
-import ibb.api.phenotypeservice.rest.PhenotypeEndpoints;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusMock;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.RestAssured;
-import jakarta.inject.Inject;
 
 @QuarkusTest
 @TestHTTPEndpoint(PhenotypeEndpoints.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class PhenotypeServiceTest {
+public class PhenotypeEndpointsTest {
 
     @BeforeAll
     public static void setUp() throws IOException {
-        ImageServiceClient imageService = new ImageServiceClient() {
-            @Override
-            public List<ImageMetadata> upload(File file) {
-                ImageMetadata metadata = new ImageMetadata();
-                metadata.id = UUID.randomUUID().toString();
-                return List.of(metadata);
-            }
-
-            @Override
-            public List<ImageMetadata> getMetadata(List<String> ids) {
-                return null;
-            }
-        };
+        ImageServiceClient imageService = new ImageServiceClientMock();
         QuarkusMock.installMockForType(imageService, ImageServiceClient.class, RestClient.LITERAL);
     }
 
@@ -59,9 +44,6 @@ public class PhenotypeServiceTest {
         public static final int BEFORE_DELETE_PHENOTYPE = 4;
         public static final int AFTER_DELETE_PHENOTYPE = 5;
     }
-
-    @Inject
-    PhenotypeRepository phenotypeRepository;
 
     static String phenotypeId;
 
@@ -91,9 +73,9 @@ public class PhenotypeServiceTest {
             .when()
                 .post()
             .then()
+                .body("violations", nullValue())
                 .statusCode(200)
                 .body("id", notNullValue())
-                .body("gene", equalTo("TC003413"))
             .extract()
                 .as(Phenotype.class).id;
     }
@@ -111,23 +93,8 @@ public class PhenotypeServiceTest {
                 .statusCode(200)
                 .body("size()", is(1))
                 .body("[0].id", equalTo(phenotypeId))
-                .body("[0].gene", equalTo("TC003413"))
                 .body("[0].dsRNA.sequence", equalTo("ATGCG"))
                 .body("[0].imageIds.size()", equalTo(2));
-    }
-
-    @Test
-    @Order(Timeline.AFTER_CREATE_PHENOTYPE)
-    public void shouldFindPhenotypesByPattern() {
-        RestAssured
-            .given()
-                .queryParam("query", "head")
-            .when()
-                .get("/search")
-            .then()
-                .statusCode(200)
-                .body("total", is(1))
-                .body("data[0].id", equalTo(phenotypeId));
     }
 
     @Test

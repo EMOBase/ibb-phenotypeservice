@@ -26,4 +26,8 @@ public interface ImageServiceClient {
     @POST
     @Path("/image-metadata/get")
     public List<ImageMetadata> getMetadata(List<String> ids);
+
+    @POST
+    @Path("/image-metadata/reject")
+    public void reject(List<String> ids);
 }

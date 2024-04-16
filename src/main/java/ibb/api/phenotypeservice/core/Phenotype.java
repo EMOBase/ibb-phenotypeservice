@@ -113,7 +113,7 @@ public class Phenotype {
     public String comment;
 
     @Null(groups = ValidationGroups.Create.class)
-    public boolean iBeetle = false;
+    public Boolean iBeetle;
 
     @Null(groups = ValidationGroups.Create.class)
     public Instant createdAt;

@@ -8,6 +8,7 @@ import java.util.UUID;
 import co.elastic.clients.elasticsearch._types.query_dsl.Operator;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.SimpleQueryStringFlag;
+import co.elastic.clients.json.JsonData;
 import co.elastic.clients.json.jackson.JacksonJsonProvider;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 
@@ -25,6 +26,12 @@ import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 public class QueryParser {
     private Tokenizer tokenizer;
     private boolean randomizeInnerHitKeys = true;
+    private Float defaultPenetrance = 0.5f;
+
+    public QueryParser withDefaultPenetrance(Float defaultPenetrance) {
+        this.defaultPenetrance = defaultPenetrance;
+        return this;
+    }
 
     public Query parse(String query) throws QueryParserException {
         tokenizer = new Tokenizer(query);
@@ -84,17 +91,50 @@ public class QueryParser {
         } else if (token.getType() == Token.Type.PHRASE) {
             String phrase = token.getValue();
             String innerHitKey = randomizeInnerHitKeys ? UUID.randomUUID().toString() : phrase;
-            return Query.of(q -> q
-                .nested(n -> n
-                    .path("phenotypes")
-                    .query(q2 -> q2
-                        .simpleQueryString(q3 -> q3
+            Query penetranceQuery = Query.of(q -> q
+                .range(r -> r
+                    .field("phenotypes.penetrance")
+                    .gte(JsonData.of(defaultPenetrance))
+                )
+            );
+            Query termQuery = Query.of(q -> q
+                .constantScore(c -> c
+                    .filter(f -> f
+                        .simpleQueryString(q2 -> q2
+                            .query(phrase)
+                            .autoGenerateSynonymsPhraseQuery(false)
+                            .defaultOperator(Operator.And)
+                            .flags(SimpleQueryStringFlag.Whitespace, SimpleQueryStringFlag.Not, SimpleQueryStringFlag.Phrase)
+                            .fields("phenotypes.description", "phenotypes.structures.termName")
+                        )
+                    )
+                    .boost(1000.0f)
+                )
+            );
+            Query synonymQuery = Query.of(q -> q
+                .constantScore(c -> c
+                    .filter(f -> f
+                        .simpleQueryString(q2 -> q2
                             .query(phrase)
                             .autoGenerateSynonymsPhraseQuery(false)
                             .defaultOperator(Operator.And)
                             .flags(SimpleQueryStringFlag.Whitespace, SimpleQueryStringFlag.Not, SimpleQueryStringFlag.Phrase)
                             .fields("phenotypes.description", "phenotypes.structures.termName")
                             .analyzer("phenotype_search_analyzer")
+                        )
+                    )
+                    .boost(1.0f)
+                )
+            );
+
+            return Query.of(q -> q
+                .nested(n -> n
+                    .path("phenotypes")
+                    .query(q2 -> q2
+                        .bool(b -> b
+                            .should(termQuery, synonymQuery)
+                            .minimumShouldMatch("1")
+                            .filter(penetranceQuery)
                         )
                     )
                     .innerHits(h -> h.name(innerHitKey).size(100))

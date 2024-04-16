@@ -1,4 +1,4 @@
-package ibb.api.phenotypeservice.queryparser;
+package ibb.api.phenotypeservice.search.queryparser;
 
 import static ibb.api.phenotypeservice.search.queryparser.Tokenizer.AND;
 import static ibb.api.phenotypeservice.search.queryparser.Tokenizer.LPAREN;
@@ -15,9 +15,6 @@ import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-
-import ibb.api.phenotypeservice.search.queryparser.Token;
-import ibb.api.phenotypeservice.search.queryparser.Tokenizer;
 
 public class TokenizerTest {
 

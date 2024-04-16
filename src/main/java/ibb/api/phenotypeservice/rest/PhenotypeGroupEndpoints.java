@@ -23,10 +23,12 @@ public class PhenotypeGroupEndpoints {
     @GET
     @Path("/search")
     public PhenotypeGroupSearchResult search(@RestQuery @NotBlank String query,
-        @RestQuery @DefaultValue("0") int from, @RestQuery @DefaultValue("20") int size
+        @RestQuery @DefaultValue("0.5") float penetrance,
+        @RestQuery @DefaultValue("0") int from,
+        @RestQuery @DefaultValue("20") int size
     ) throws IOException {
         try {
-            return phenotypeGroupRepository.search(query, from, size);
+            return phenotypeGroupRepository.search(query, penetrance, from, size);
         } catch (QueryParserException e) {
             throw new BadRequestException("query is invalid", e);
         }
