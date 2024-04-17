@@ -108,12 +108,14 @@ public class Phenotype {
     @Null(groups = ValidationGroups.Create.class)
     public List<ImageMetadata> images;
 
-    public String topic;
     public Integer dayPostInjection;
     public String comment;
 
     @Null(groups = ValidationGroups.Create.class)
-    public Boolean iBeetle;
+    public String iBeetleTopic;
+
+    @Null(groups = ValidationGroups.Create.class)
+    public String iBeetleExperiment;
 
     @Null(groups = ValidationGroups.Create.class)
     public Instant createdAt;
