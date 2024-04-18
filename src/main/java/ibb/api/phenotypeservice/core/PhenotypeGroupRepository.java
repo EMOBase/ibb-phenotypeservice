@@ -164,6 +164,7 @@ public class PhenotypeGroupRepository {
         if (pg == null) {
             return List.of();
         }
+        fillImageMetadata(pg.phenotypes);
         return pg.phenotypes;
     }
 
