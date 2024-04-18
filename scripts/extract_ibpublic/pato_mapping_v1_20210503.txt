@@ -1,0 +1,437 @@
+## qualitative -> amount -> absent
+NULL	not present	3164    #E.g. larval head antenna not present
+number	not present	2	#E.g. legs sometimes number not present
+
+## qualitative -> amount -> present
+NULL	present	48  #E.g. legs pretarsus present
+
+## qualitative -> amount -> decreased amount
+number	decreased	1017    #E.g. thorax segment number decreased
+NULL	decreased	125 #E.g. wings decreased
+amount	decreased	33  #E.g. yolk amount decreased
+number	degenerated	1   #E.g. lateral oviduct number degenerated
+
+## qualitative -> amount -> increased amount
+number	increased	175 #E.g. legs number increased
+amount	increased	11  #E.g. previtellogenic egg chamber amount increased
+NULL	increased	4   #E.g. vitellogenic egg chamber increased
+
+## TODO: the same as present?
+NULL	remaining	179 #E.g. gut remaining
+
+## TODO: don't understand
+number	of remaining segments  decreased	7	#E.g. abdomen segment number # of remaining segments  decreased
+NULL	of remaining segments  not present	3	#E.g. abdomen partially # of remaining segments  not present
+number	of remaining segments  increased	2	#E.g. abdomen segment number # of remaining segments  increased
+NULL	of remaining segments  remaining	2	#E.g. abdomen posterior # of remaining segments  remaining
+
+
+
+
+## TODO: physical object quality -> morphology -> structure -> structure, cavities -> hollow
+embryo/egg	without visible larval cuticle in cuticle preparation	2409
+
+## TODO: cuticle remnants?
+cuticle remnants	with some identifiable segments	301
+cuticle remnants	with unidentifyable segments	286
+NULL	with some identifiable segments	102
+cuticle remnants	strongly fragmented (cuticle crumbs)	87
+NULL	with unidentifyable segments	47
+NULL	without visible segmentation, differentiation or axis	47
+cuticle remnants	without visible segmentation, differentiation or axis	45
+NULL	without visible segmentation but polarity	7
+cuticle remnants	without visible segmentation but ap-polarity	3
+NULL	strongly fragmented (crumbs)	3
+cuticle remnants	NULL	3
+NULL	without visible segmentation but ap-polarity	2
+cuticle remnants	without visible segmentation but polarity	1
+NULL	without visible segmentation but dv-polarity	1
+
+
+
+
+## qualitative -> normal
+NULL	without detectable defects	566 #E.g. ovary without detectable defects
+
+## qualitative -> deviation (from_normal) -> abnormal
+NULL	irregular	520 #E.g. abdomen musculature irregular
+
+## physical object quality -> spatial pattern -> irregular spatial pattern
+pattern	irregular	939 #E.g. larval musculature pattern irregular
+
+## physical object quality -> morphology -> shape -> irregularly shaped
+shape	irregular	877 #E.g. wings shape irregular
+
+## TODO: should create "irregular" term for the corresponding qualifier? Or map to term "abnormal"?
+orientation	irregular	300 #E.g. head orientation irregular
+structure	irregular	188 #E.g. vitellogenic egg chamber structure irregular
+position	irregular	139	#E.g. head appendages position irregular
+surface	irregular	73	#E.g. tropharium surface irregular
+circumference	irregular	14  #E.g. larva circumference irregular
+size	irregular	10  #E.g. prothoracic leg size irregular
+colour	irregular	8   #E.g. elytra colour irregular
+number	irregular	6   #E.g. longitudinal dorsal thoracic muscles number irregular
+symmetry	irregular	3	#E.g. thorax symmetry irregular
+
+
+
+
+## physical object quality -> morphology -> size -> decreased size
+size	decreased	631 #E.g. larva segment size decreased
+
+## physical object quality -> morphology -> size -> increased size
+size	increased	37  #E.g. thorax segment ventral size increased
+
+## physical object quality -> morphology -> size -> 1-D extent -> thickness -> decreased thickness
+NULL	thinner 	142 #E.g. larval musculature thinner
+shape	thinner 	8   #E.g. larval musculature shape thinner
+structure	thinner 	2   #E.g. dorsal thoracic muscles structure thinner
+surface	thinner 	1   #E.g. egg shell surface thinner
+size	thinner 	1   #E.g. larva size thinner
+
+## physical object quality -> morphology -> size -> 1-D extent -> perimeter -> circumference -> decreased circumference
+circumference	decreased	42  #E.g. abdomen circumference decreased
+circumference	constricted	1   #E.g. abdomen partially circumference constricted
+circumference	thinner 	1   #E.g. thorax & abdomen segment circumference thinner
+
+## physical object quality -> morphology -> size -> 1-D extent -> perimeter -> circumference -> increased circumference
+NULL	broader	41  #E.g. legs broader
+shape	broader	8   #E.g. head & thorax appendages shape broader
+circumference	increased	6   #E.g. abdomen circumference increased
+size	broader	4   #E.g. maxilla size broader
+structure	broader	3   #E.g. mandible structure broader
+circumference	broader	1   #E.g. abdomen partially median circumference broader
+
+# physical object quality -> morphology -> size -> 1-D extent -> width -> decreased width
+width	decreased	1	#E.g. elytra distal width decreased
+
+
+
+
+## physical object quality -> morphology -> shape -> shortened
+NULL	shortened	576 #E.g. wings shortened
+size	shortened	100 #E.g. legs size shortened
+structure	shortened	3	#E.g. wings structure shortened
+shape	shortened	2	#E.g. antenna shape shortened
+
+## physical object quality -> morphology -> shape -> bent
+NULL	bent	99  #E.g. antenna bent
+orientation	bent	24  #E.g. antenna orientation bent
+shape	bent	5   #E.g. antenna shape bent
+
+## physical object quality -> morphology -> shape -> straight
+NULL	not bent	2	#E.g. head not bent
+
+## physical object quality -> morphology -> shape -> 2-D shape -> superelliptic -> elliptic -> circular
+NULL	rounded	87  #E.g. larval musculature rounded
+shape	rounded	45  #E.g. larval musculature shape rounded
+structure	rounded	2	#E.g. female genital lobes structure rounded
+
+## physical object quality -> morphology -> shape -> elongated
+NULL	elongated	26  # antenna elongated
+size	elongated	6   #E.g. elytra size elongated
+
+## physical object quality -> morphology -> shape -> split
+NULL	split	18  #E.g. oblique dorsal thoracic muscles split
+structure	split	2	#E.g. head structure split
+
+## physical object quality -> morphology -> shape -> curvature -> flattened
+NULL	flattened	1	#E.g. scutellum flattened
+
+
+
+
+
+## physical object quality -> morphology -> spatial pattern -> regular spatial pattern -> oriented -> everted
+NULL	everted (inside-out)	422 #E.g. head & thorax & abdomen everted (inside-out)
+
+## physical object quality -> morphology -> spatial pattern -> color pattern -> multi-colored -> spotted
+NULL	spotted	10  #E.g. egg shell spotted
+colour	spotted	2   #E.g. pupa cuticle colour spotted
+
+## TODO: what does position spotted mean?
+position	spotted	1	#E.g. abdominal odoriferous glands position spotted
+
+## physical object quality -> morphology -> spatial pattern -> random pattern
+pattern	not present	2	#E.g. larval musculature random pattern not present
+
+## physical object quality -> morphology -> spatial pattern -> color pattern -> colorless
+colour	not present	6   #E.g. abdominal odoriferous glands colour not present
+
+## TODO: physical object quality -> morphology -> spatial pattern -> symmetry
+symmetry	decreased	1	#E.g. elytra symmetry decreased
+symmetry	NULL	1	#E.g. larval musculature symmetry
+
+
+
+
+
+## physical object quality -> physical quality -> radiation quality -> electromagnetic (EM) radiation quality -> optical quality -> color brightness -> low brightness
+colour	darker	81  #E.g. abdominal odoriferous glands colour darker
+NULL	darker	28  #E.g. abdominal odoriferous glands darker
+surface	darker	1	#E.g. larva surface darker
+
+## physical object quality -> physical quality -> radiation quality -> electromagnetic (EM) radiation quality -> optical quality -> color brightness -> high brightness
+colour	lighter	25  #E.g. elytra colour lighter
+pigmentation/tanning	lighter	1	#E.g. antenna distal pigmentation/tanning lighter
+NULL	lighter	1	#E.g. posterior terminus sometimes lighter
+
+## physical object quality -> physical quality -> radiation quality -> electromagnetic (EM) radiation quality -> optical quality -> opacity -> opaque
+colour	opaque	2	#E.g. abdominal odoriferous glands colour opaque
+surface	opaque	2	#E.g. eyes surface opaque
+
+## physical object quality -> physical quality -> radiation quality -> electromagnetic (EM) radiation quality -> full-spectrum EM radiation quality -> radiation reflective quality -> reflectivity -> glistening
+NULL	shiny	1	#E.g. yolk shiny
+
+
+## physical object quality -> morphology -> structure -> degree of pigmentation -> pigmented -> decreased pigmentation
+colour	decreased	12  #E.g. elytra distal colour decreased
+pigmentation/tanning	decreased	1	#E.g. elytra pigmentation/tanning decreased
+
+## physical object quality -> morphology -> structure -> degree of pigmentation -> unpigmented
+pigmentation/tanning	not present	2	#E.g. hindwing distal pigmentation/tanning not present
+
+
+
+
+
+
+## physical object quality -> morphology -> closure -> open
+NULL	not closed	351 #E.g. wings dorsal not closed
+
+## TODO: no term for folding?
+folding	irregular	16  #E.g. hindwing folding irregular
+folding	not present	2	#E.g. wings folding not present
+
+
+
+
+## physical object quality -> morphology -> structure -> fused with
+NULL	fused	255 #E.g. legs podomer potentially fused
+structure	fused	2	#E.g. ommatidia potentially structure fused
+
+## physical object quality -> morphology -> structure -> unfused from
+NULL	not fused	33  #E.g. larva cuticle dorsal not fused
+structure	not fused	1	#E.g. labial palp potentially structure not fused
+position	not fused	1	#E.g. labial palp ventral position not fused
+
+## physical object quality -> morphology -> structure -> wholeness -> broken -> fragmented
+NULL	fragmented	34  #E.g. cuticle remnants strongly fragmented (cuticle crumbs)
+structure	fragmented	3   #E.g. tropharium structure fragmented
+
+## physical object quality -> morphology -> structure -> degeneration -> degenerate
+NULL	degenerated	187 #E.g. larval musculature potentially degenerated
+structure	degenerated	9   #E.g. vitellogenic egg chamber sometimes structure degenerated
+
+## physical object quality -> morphology -> structure -> constricted
+NULL	constricted	118 #E.g. abdominal segment 1 constricted
+shape	constricted	2   #E.g. vitellogenic egg chamber sometimes shape constricted
+size	constricted	1   #E.g. ovipositor size constricted
+
+## physical object quality -> morphology -> structure -> swollen
+NULL	swollen	56  #E.g. ovary  swollen
+shape	swollen	17  #E.g. head appendages shape swollen
+structure	swollen	3	#E.g. head appendages distal structure swollen
+
+## physical object quality -> morphology -> structure -> necrotic
+NULL	necrotic	45	#E.g. wings necrotic
+structure	necrotic	2	#E.g. urogomphi structure necrotic
+
+
+
+
+## physical object quality -> morphology -> texture -> blistered
+NULL	blistered	97  #E.g. elytra blistered
+structure	blistered	3   #E.g. elytra structure blistered
+surface	blistered	2   #E.g. elytra surface blistered
+
+## physical object quality -> morphology -> texture -> rough
+surface	rough	3   #E.g. elytra surface rough
+
+## physical object quality -> morphology -> texture -> coating -> viscid
+NULL	sticky	2	#E.g. thorax & abdomen sticky
+surface	sticky	1	#E.g. egg shell surface sticky
+
+
+
+
+## physical object quality -> morphology -> deformed -> malformed -> anterioralized
+position	anteriorized	7   #E.g. yolk position anteriorized
+NULL	anteriorized	1	#E.g. egg chamber partially anteriorized
+
+## physical object quality -> morphology -> deformed -> malformed -> ventralized
+position	ventralized	2	#E.g. maxilla bristle position ventralized
+orientation	ventralized	1	#E.g. head & thorax orientation ventralized
+
+## physical object quality -> morphology -> deformed -> malformed -> dorsalized
+position	dorsalized	1	#E.g. intercoxal process A3 position dorsalized
+NULL	dorsalized	1	#E.g. abdomen segment dorsal dorsalized
+
+## physical object quality -> morphology -> deformed -> malformed -> posterioralized
+position	posteriorized	1	#E.g. labium position posteriorized
+NULL	posteriorized	1	#E.g. vitellogenic egg chamber late posteriorized
+
+
+
+
+## physical object quality -> physical quality -> position -> protruding
+NULL	protruding	9   #E.g. head dorsal protruding
+NULL	with protrusion	4   #E.g. abdomen with protrusion
+surface	with protrusion	2   # E.g. mesonotum surface with protrusion
+surface	protruding	1   #E.g. pronotum ectopically sometimes surface protruding
+
+## physical object quality -> physical quality -> elasticity -> elastic -> increased elasticity
+elasticity	increased	1	#E.g. egg shell potentially elasticity increased
+
+
+
+
+
+
+## TODO: what does fluorescence represents?
+fluorescence	decreased	183 #E.g. larval musculature fluorescence decreased
+fluorescence	not present	29  #E.g. larval musculature fluorescence not present
+fluorescence	broader	6   #E.g. larval musculature fluorescence broader
+fluorescence	degenerated	3   #E.g. larval musculature fluorescence degenerated
+fluorescence	present	1	#E.g. eyes fluorescence present
+fluorescence	irregular	1	#E.g. larval musculature fluorescence irregular
+fluorescence	increased	1	#E.g. head musculature fluorescence increased
+
+## TODO: how to model content of abdominal odoriferous glands?
+content	darker	54  #E.g. abdominal odoriferous glands content darker
+content	not present	51  #E.g. abdominal odoriferous glands content not present
+content	decreased	32  #E.g. abdominal odoriferous glands content decreased
+content	fragmented	17  #E.g. abdominal odoriferous glands content fragmented
+content	split	10  #E.g. abdominal odoriferous glands content split
+content	irregular	5	#E.g. abdominal odoriferous glands content irregular
+content	opaque	5	#E.g. abdominal odoriferous glands content opaque
+content	necrotic	4	#E.g. abdominal odoriferous glands content necrotic
+content	lighter	3   #E.g. abdominal odoriferous glands content lighter
+content	spotted	1	#E.g. abdominal odoriferous glands content spotted
+
+## TODO
+segmentation/division	irregular	36  #E.g. abdomen posterior segmentation/division irregular
+segmentation/division	incomplete	1 #E.g. larva segmentation/division incomplete
+segmentation/division	not present	9   #E.g. egg chamber sometimes segmentation/division not present
+segmentation/division	constricted	1
+segmentation/division	increased	1
+segmentation/division	decreased	1
+segmentation/division	present	1
+
+## TODO: what does stage sequence mean?
+stage sequence	irregular	24  #E.g. egg chamber stage sequence irregular
+stage sequence	not present	1
+stage sequence	aborted	1
+
+## TODO: what does deposition mean?
+deposition	irregular	17  #E.g. yolk deposition irregular
+deposition	degenerated	3   #E.g. yolk deposition degenerated
+deposition	NULL	2	#E.g. yolk ectopically deposition
+deposition	present	1	#E.g. previtellogenic egg chamber sometimes deposition present
+deposition	not present	1	#E.g. vitellogenic egg chamber late deposition not present
+deposition	delayed 	1	#E.g. vitellogenic egg chamber deposition delayed
+
+## TODO: what does cuticularisation mean?
+cuticularisation	decreased	13	#E.g. antenna cuticularisation decreased
+cuticularisation	irregular	2
+cuticularisation	not closed	2
+cuticularisation	darker	2
+cuticularisation	sticky	1
+cuticularisation	not present	1
+cuticularisation	lighter	1
+cuticularisation	accelerated	1
+
+## TODO: no term for robustness?
+robustness	decreased	11 #E.g. ovary robustness decreased
+robustness	increased	1	#E.g. egg shell potentially robustness increased
+
+
+
+
+
+
+
+
+
+## TODO
+NULL	transformed	40  #E.g. abdomen segment transformed
+
+
+## TODO: physical object quality -> morphology -> structure -> unstructured
+structure	not present	12  #E.g. maxillary palp structure not present
+
+
+# TODO
+dv-orientation	irregular	6
+ap-orientation	irregular	2
+ap-orientation	not present	1
+
+# TODO
+anteroposterior-axis	shortened	4
+dorsoventral-axis	shortened	3
+dorsoventral-axis	irregular	3
+dorsoventral-axis	increased	2
+dorsoventral-axis	thinner 	2
+anteroposterior-axis	increased	1
+anteroposterior-axis	irregular	1
+anteroposterior-axis	not bent	1
+anteroposterior-axis	not present	1
+anteroposterior-axis	decreased	1
+anteroposterior-axis	elongated	1
+dorsoventral-axis	constricted	1
+dorsoventral-axis	broader	1   #E.g. abdomen partially dorsoventral-axis broader
+
+
+## TODO: physical object quality -> morphology -> structure -> incomplete structure
+differentiation	incomplete	10  #E.g. larval musculature differentiation incomplete
+differentiation	aborted	3   #E.g. egg chamber potentially differentiation aborted
+NULL	incomplete	1	#E.g. head & thorax unilateral incomplete
+
+## TODO
+differentiation	irregular	5
+
+
+
+## TODO
+rim	broader	1   #E.g. elytra anterior rim broader
+rim	irregular	1
+rim	rounded	1
+rim	bent	1   #E.g. prothorax anterior rim bent
+
+## TODO: qualitative -> amount -> increased amount -> duplicated
+NULL	duplicated	27  #E.g. larva cuticle duplicated
+
+## TODO
+structure	NULL	3	#E.g. abdominal segment 2 ectopically structure
+structure	decreased	2	#E.g. elytra cuticle structure decreased
+structure	present	2	#E.g. abdomen cuticle ectopically structure present
+structure	without detectable defects	1	#E.g. ovary structure without detectable defects
+structure	duplicated	1	# E.g. oblique dorsal thoracic muscles median sometimes structure duplicated
+structure	multiplied	1
+size	multiplied	1	#E.g. mature egg sometimes size multiplied
+NULL	multiplied	1	#E.g. abdomen potentially multiplied
+
+## TODO
+pattern	constricted	1
+pattern	lighter	1
+pattern	NULL	1
+pattern	increased	1
+pattern	fused	1
+pattern	broader	1   #E.g. head appendages pattern broader
+
+## TODO
+proximal division boundary	fused	1
+proximal division boundary	not present	1
+
+## TODO
+posterior segment boundary	irregular	2
+
+## TODO
+position	increased	2	#E.g. labial palp proximal position increased
+
+## TODO
+surface	not present	1	#E.g. pronotum bristle dorsal median surface not present
+
+## TODO
+NULL	NULL	26  #E.g. head & thorax & abdomen
+
