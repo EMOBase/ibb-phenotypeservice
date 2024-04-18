@@ -170,6 +170,7 @@ public class PhenotypeGroupRepository {
 
     private void fillImageMetadata(List<Phenotype> phenotypes) {
         Map<String, List<Phenotype>> imageIdToPhenotypes = phenotypes.stream()
+                .filter(p -> p.imageIds != null)
                 .flatMap(p -> p.imageIds.stream().map(i -> Map.entry(i, p)))
                 .collect(Collectors.groupingBy(Map.Entry::getKey,
                         Collectors.mapping(Map.Entry::getValue, Collectors.toList())));

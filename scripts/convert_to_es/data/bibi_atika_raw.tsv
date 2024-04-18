@@ -1,0 +1,179 @@
+SG	 # iB 	OGS	phenotypes
+1	iB_06455	TC_012436	colorless secretion
+2	iB_06635	TC_001001	size decrease
+3	iB_07379	TC_001313	less secretion
+4	iB_07536	TC_006542	secretion color darker
+5	iB_07738	TC_031704	size decrease
+6	iB_07787	TC_004104	irregular reservoir size
+7	iB_07820	TC_004888	melanized gland content
+8	iB_07886	TC_000385	irregular reservoir size
+9	iB_07950	TC_001561	secretion color darker
+10	iB_07976	TC_003545	secretion color lighter
+11	iB_08057	TC_002414	less secretion
+12	iB_08160	TC_008320	secretion color darker
+13	iB_08263	TC_010415	size decrease
+14	iB_08565	TC_014905	less secretion
+15	iB_08572	TC_015824	secretion color lighter
+16	iB_08877	TC_031556	less secretion
+17	iB_09271	TC_006096	size decrease
+18	iB_10094	TC_014560	irregular reservoir size
+19	iB_10258	TC_009294	secretion color darker
+20	iB_10282	TC_009200	irregular reservoir size
+21	iB_10307	TC_033640	less secretion
+22	iB_10350	TC_009870	size decrease
+23	iB_10379	TC_008830	less secretion
+24	iB_10398	TC_033833	size decrease
+25	iB_10399	TC_010875	size decrease
+26	iB_10410	TC_008670	less secretion
+27	iB_10416	TC_008693	less secretion
+28	iB_10636	TC_006130	less secretion
+29	iB_10818	TC_012600	less secretion
+30	iB_10843	TC_001560	less secretion
+31	iB_12106	TC_002985	less secretion
+32	iB_12119	TC_003441	less secretion
+33	iB_12122	TC_003525	less secretion
+34	iB_12143	TC_004593	secretion color lighter
+35	iB_12151	TC_004701	less secretion
+36	iB_12159	TC_004875	less secretion
+37	iB_12160	TC_004877	less secretion
+38	iB_12164	TC_004940	size decreae
+39	iB_12171	TC_005040	less secretion
+40	iB_12179	TC_005125	less secretion
+41	iB_12227	TC_006117	size decrease
+42	iB_12410	TC_008647	size decrease
+43	iB_12420	TC_008757	secretion color darker
+44	iB_12424	TC_008780	colorless secretion
+45	iB_12502	TC_009891	secretion color darker
+46	iB_12548	TC_010490	secretion color darker
+47	iB_12567	TC_010739	less secretion
+48	iB_12594	TC_011162	irregular reservoir size
+49	iB_12808	TC_013415	less secretion
+50	iB_12904	TC_014568	less secretion
+51	iB_12930	TC_014956	size decrease
+52	iB_12934	TC_014988	less secretion
+53	iB_12946	TC_015183	secretion color darker
+54	iB_12953	TC_015294	secretion color lighter
+55	iB_12957	TC_015339	less secretion
+56	iB_12988	TC_015711	irregular reservoir size
+57	iB_12995	TC_015806	secretion color darker
+58	iB_12998	TC_015831	less secretion
+59	iB_13213	TC_031234	less secretion
+60	iB_13267	TC_031901	size decrease
+61	iB_13286	TC_032059	less secretion
+62	iB_13287	TC_032061	size decrease
+63	iB_13384	TC_033142	less secretion
+64	iB_13393	TC_033231	less secretion
+65	iB_13397	TC_033244	size decrease
+66	iB_13400	TC_033252	secretion color lighter
+67	iB_13404	TC_033289	size decrease
+68	iB_13418	TC_033437	size decrease
+69	iB_13420	TC_033443	size decrease
+70	iB_13427	TC_033511	less secretion
+71	iB_13436	TC_033565	less secretion
+72	iB_13442	TC_033617	size decrease
+73	iB_13443	TC_033629	size decrease
+74	iB_13444	TC_033633	size decrease
+75	iB_13446	TC_033680	size decrease
+76	iB_13447	TC_033682	less secretion
+77	iB_13455	TC_033734	size decrease
+78	iB_13462	TC_033825	less secretion
+79	iB_13470	TC_033891	less secretion
+80	iB_13474	TC_033927	size decrease
+81	iB_13476	TC_033970	secretion color lighter
+82	iB_13479	TC_034016	less secretion
+83	iB_13480	TC_034021	irregular reservoir size
+84	iB_13481	TC_034049	secretion color darker
+85	iB_13490	TC_034143	less secretion
+86	iB_13492	TC_034186	less secretion
+87	iB_13507	TC_034300	size decrease
+88	iB_13520	TC_034418	secretion color lighter
+89	iB_13523	TC_034433	irregular reservoir size
+90	iB_13525	TC_034455	less secretion
+91	iB_13527	TC_034461	size decrease
+92	iB_13531	TC_034478	size decrease
+93	iB_13538	TC_034552	size decrease
+94	iB_13539	TC_034560	less secretion
+95	iB_13541	TC_034598	less secretion
+96	iB_13546	TC_034629	size decrease
+97	iB_13550	TC_034643	less secretion
+98	iB_13552	TC_034655	size decrease
+99	iB_13556	TC_034670	secretion color darker
+100	iB_13558	TC_034684	less secretion
+101	iB_13560	TC_034694	secretion color darker
+102	iB_13565	TC_034733	less secretion
+103	iB_13568	TC_034761	melanized gland content
+104	iB_13576	TC_034847	less secretion
+105	iB_13578	TC_034897	size decrease
+106	iB_13585	TC_035033	irregular reservoir size
+107	iB_13602	TC_001666	secretion color lighter
+108	iB_13614	TC_004281	less secretion
+109	iB_13619	TC_005085	less secretion
+110	iB_13626	TC_005432	less secretion
+111	iB_13628	TC_005475	secretion color darker
+112	iB_13639	TC_006626	irregular reservoir size
+113	iB_13656	TC_011350	less secretion
+114	iB_13660	TC_012397	secretion color darker
+115	iB_13667	TC_012635	less secretion
+116	iB_13673	TC_013464	less secretion
+117	iB_13677	TC_013821	less secretion
+118	iB_13680	TC_014087	less secretion
+119	iB_13692	TC_030268	less secretion
+120	iB_13694	TC_030367	irregular reservoir size
+121	iB_13698	TC_030961	less secretion
+122	iB_13701	TC_031342	secretion color darker
+123	iB_13704	TC_032134	size decrease
+124	iB_13707	TC_032365	size decrease
+125	iB_13712	TC_032843	less secretion
+126	iB_13723	TC_033974	size decraese
+127	iB_13730	TC_034797	less secretion
+128	iB_13736	TC_004248	less secretion
+129	iB_13739	TC_034703	irregular reservoir size
+130	iB_13754	TC_000145	less secretion
+131	iB_13761	TC_000233	less secretion
+132	iB_13815	TC_001141	size decrease
+133	iB_13821	TC_001282	size decrease
+134	iB_14407	TC_010819	melanized gland content
+135	iB_14666	TC_014799	melanized gland content
+136	iB_14689	TC_015027	melanized gland content
+137	iB_14948	TC_031796	less secretion
+138	iB_14954	TC_031816	size decrease
+139	iB_14977	TC_032119	less secretion
+140	iB_15009	TC_032351	size decrease
+141	iB_15044	TC_032638	less secretion
+142	iB_15047	TC_032680	less secretion
+143	iB_15051	TC_032701	less secretion
+144	iB_15097	TC_033013	secretion color darker
+145	iB_15098	TC_033033	less secretion
+146	iB_15099	TC_033038	less secretion
+147	iB_15103	TC_033054	size decrease
+148	iB_15108	TC_033099	secretion color darker
+149	iB_15160	TC_033548	less secretion
+150	iB_15169	TC_033618	less secretion
+151	iB_15175	TC_033669	size decrease
+152	iB_15179	TC_033697	size decrease
+153	iB_15181	TC_033706	secretion color lighter
+154	iB_15193	TC_033767	size decrease
+155	iB_15264	TC_034059	size decrease
+156	iB_15303	TC_034372	less secretion
+157	iB_15413	TC_035015	less secretion
+158	iB_15423	TC_002355	size decrease
+159	iB_15460	TC_004035	size decrease
+160	iB_15474	TC_033089	less secretion
+161	iB_15476	TC_007783	less secretion
+162	iB_15482	TC_030990	less secretion
+163	iB_15490	TC_032467	less secretion
+164	iB_15493	TC_032672	less secretion
+165	iB_15516	TC_003982	melanized gland content
+166	iB_15531	TC_000135	less secretion
+167	iB_15626	TC_013964	melanized gland content
+168	iB_15646	TC_034192	melanized gland content
+169	iB_15676	TC_014148	less secretion
+170	iB_15744	TC_034027	less secretion
+171	iB_15758	TC_031031	secretion color lighter
+172	iB_15780	TC_003508	less secretion
+173	iB_15798	TC_016343	secretion color lighter
+174	iB_15842	TC_035027	secretion color darker
+175	iB_15862	TC_033874	secretion color darker
+176	iB_15886	TC_033024	secretion color darker
+177	iB_15894	TC_007245	secretion color darker
+178	iB_15895	TC_012617	secretion color darker
