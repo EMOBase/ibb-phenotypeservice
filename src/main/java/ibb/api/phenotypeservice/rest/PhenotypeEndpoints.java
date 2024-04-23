@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.jboss.resteasy.reactive.PartType;
 import org.jboss.resteasy.reactive.RestForm;
 import org.jboss.resteasy.reactive.RestPath;
@@ -31,6 +32,7 @@ public class PhenotypeEndpoints {
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
+    @Operation(hidden = true)
     public Phenotype create(
         @RestForm("images")
         List<File> images,
@@ -53,6 +55,7 @@ public class PhenotypeEndpoints {
 
     @DELETE
     @Path("/{id}")
+    @Operation(hidden = true)
     public void delete(@RestPath String id) throws IOException {
         pgRepo.deletePhenotype(id);
     }

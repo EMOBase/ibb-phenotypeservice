@@ -2,6 +2,7 @@ package ibb.api.phenotypeservice.rest;
 
 import java.io.IOException;
 
+import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.jboss.resteasy.reactive.RestQuery;
 
 import ibb.api.phenotypeservice.core.PhenotypeGroupRepository;
@@ -22,6 +23,7 @@ public class PhenotypeGroupEndpoints {
 
     @GET
     @Path("/search")
+    @Operation(hidden = true)
     public PhenotypeGroupSearchResult search(@RestQuery @NotBlank String query,
         @RestQuery @DefaultValue("0.5") float penetrance,
         @RestQuery @DefaultValue("0") int from,
