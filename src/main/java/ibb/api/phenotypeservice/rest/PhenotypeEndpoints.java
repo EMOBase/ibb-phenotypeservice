@@ -11,6 +11,7 @@ import org.jboss.resteasy.reactive.RestPath;
 
 import ibb.api.phenotypeservice.core.Phenotype;
 import ibb.api.phenotypeservice.core.PhenotypeGroupRepository;
+import io.quarkus.security.Authenticated;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -56,6 +57,7 @@ public class PhenotypeEndpoints {
     @DELETE
     @Path("/{id}")
     @Operation(hidden = true)
+    @Authenticated
     public void delete(@RestPath String id) throws IOException {
         pgRepo.deletePhenotype(id);
     }
