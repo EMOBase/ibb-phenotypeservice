@@ -3,6 +3,7 @@ package ibb.api.phenotypeservice.core;
 import java.io.File;
 import java.util.List;
 
+import org.eclipse.microprofile.rest.client.annotation.RegisterClientHeaders;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 import org.jboss.resteasy.reactive.RestForm;
 
@@ -15,6 +16,7 @@ import jakarta.ws.rs.core.MediaType;
 
 @Path("/")
 @RegisterRestClient(configKey = "image-service")
+@RegisterClientHeaders
 public interface ImageServiceClient {
 
     @POST
