@@ -32,7 +32,6 @@ public class Phenotype {
         @Schema(example = "iB_03553")
         public String name;
 
-        @NotBlank(groups = ValidationGroups.Create.class)
         @Schema(example = "CGAGATAGTGAGTTTCTTCT")
         public String sequence;
     }
@@ -65,8 +64,6 @@ public class Phenotype {
     @NotBlank(groups = ValidationGroups.Create.class)
     public String gene;
 
-    @Valid
-    @NotNull(groups = ValidationGroups.Create.class)
     public DsRNA dsRNA;
 
     @NotNull(groups = ValidationGroups.Create.class)
