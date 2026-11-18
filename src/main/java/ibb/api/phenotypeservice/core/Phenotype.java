@@ -7,12 +7,17 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
 
+// The Elasticsearch client maps documents to this class (and its nested
+// classes) by reflection, which a native executable only allows for
+// registered classes.
+@RegisterForReflection
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 public class Phenotype {
 
